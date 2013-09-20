@@ -14,7 +14,7 @@ Installation
 Features
 ============
  - read input events from keyboard, mouse, joystick, gamepad and wheel(untested);
- - safetly remove device from stack after it was plugged out;
+ - safety remove device from stack after it was plugged out;
 
 Issues
 ============
