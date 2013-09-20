@@ -9,17 +9,20 @@ Installation
     cd build
     ../configure --prefix=/usr/local
     make && sudo make install && sudo ../post_install.sh
+    make distclean
 
-features:
+Features
+============
  - read input events from keyboard, mouse, joystick, gamepad and wheel(untested);
  - safetly remove device from stack after it was plugged out;
 
-ISSUES:
+Issues
+============
  - auto connect for runtime plugged devices does not work;
 
-TODO:
+TODO
+============
  - examples;
  - docxygen;
  - automaticly add connected device to stack;
-
 

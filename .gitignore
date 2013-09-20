@@ -12,9 +12,12 @@
 *.la
 *.a
 
-# automake
+# automake cache files
 /autom4te.cache/
 
-#gedit
+# gedit backup files
 *~
+
+# build temp files
+/build/
 
