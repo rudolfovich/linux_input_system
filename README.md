@@ -11,12 +11,15 @@ Installation
     make && sudo make install && sudo ../post_install.sh
 
 features:
- - read keyboard
-
-TODO:
- - example
- - docxygen
+ - read input events from keyboard, mouse, joystick, gamepad and wheel(untested);
+ - safetly remove device from stack after it was plugged out;
 
 ISSUES:
- - auto connect for runtime plugged devices does not work
+ - auto connect for runtime plugged devices does not work;
+
+TODO:
+ - examples;
+ - docxygen;
+ - automaticly add connected device to stack;
+
 
