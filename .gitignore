@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+# automake
+/autom4te.cache/
+
+#gedit
+*~
+
