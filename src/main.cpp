@@ -10,7 +10,7 @@
 
 using namespace std;
 
-static void InputEventCallback(inputDeviceAbstract *device, InputDriverEventInput *event, void *data)
+static void InputEventCallback(InputDeviceAbstract *device, InputDriverEventInput *event, void *data)
 {
 	char type[256];
 	const char *name;
