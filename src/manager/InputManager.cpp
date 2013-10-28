@@ -44,32 +44,32 @@ InputManager::~InputManager()
 {
 }
 
-int InputManager::Initialize()
+int InputManager::initialize()
 {
-	mInputSubsystem.Initialize();
-	mInputSubsystem.RegisterConnectedCallback(InputSubsystemConnectedCallback, this);
-	mInputSubsystem.RegisterDisconnectedCallback(InputSubsystemDisconnectedCallback, this);
+	mInputSubsystem.initialize();
+	mInputSubsystem.registerConnectedCallback(inputSubsystemConnectedCallback, this);
+	mInputSubsystem.registerDisconnectedCallback(inputSubsystemDisconnectedCallback, this);
 
 	std::list<std::string>::iterator it;
 
 	for (it = mSearchDevicePaths.begin(); it != mSearchDevicePaths.end(); it++) {
-		if (ReadDeviceList((*it).c_str())) {
+		if (readDeviceList((*it).c_str())) {
 			return -1;
 		}
 	}
 	return 0;
 }
 
-int InputManager::Finalize()
+int InputManager::finalize()
 {
-	FreeDevices();
-	mInputSubsystem.RegisterConnectedCallback(NULL, NULL);
-	mInputSubsystem.RegisterDisconnectedCallback(NULL, NULL);
-	mInputSubsystem.Finalize();
+	freeDevices();
+	mInputSubsystem.registerConnectedCallback(NULL, NULL);
+	mInputSubsystem.registerDisconnectedCallback(NULL, NULL);
+	mInputSubsystem.finalize();
 	return 0;
 }
 
-void InputManager::Log(const char *fmt, ...)
+void InputManager::log(const char *fmt, ...)
 {
 	va_list va;
 
@@ -78,7 +78,7 @@ void InputManager::Log(const char *fmt, ...)
 	va_end(va);
 }
 
-int InputManager::ReadDeviceList(const char *directory)
+int InputManager::readDeviceList(const char *directory)
 {
 	DIR *dir;
 	class dirent *ent;
@@ -102,7 +102,7 @@ int InputManager::ReadDeviceList(const char *directory)
 		if (is_directory)
 			continue;
 
-		if (ReadDevice(full_file_name.c_str())) {
+		if (readDevice(full_file_name.c_str())) {
 			//failed
 		}
 	}
@@ -111,28 +111,28 @@ int InputManager::ReadDeviceList(const char *directory)
 	return 0;
 }
 
-int InputManager::ReadDevice(const char *device_path)
+int InputManager::readDevice(const char *device_path)
 {
 	InputDeviceAbstract *device;
 
-	Log("\n");
-	Log("Creating device %s...\n", device_path);
-	device = CreateDevice(device_path);
-	Log("Creating device %s...", device_path);
+	log("\n");
+	log("Creating device %s...\n", device_path);
+	device = createDevice(device_path);
+	log("Creating device %s...", device_path);
 	if (!device) {
-		Log("failed!\n");
+		log("failed!\n");
 		return 1;
 	}
-	Log("success!\n");
-	Log("\n");
-	AddDevice(device);
+	log("success!\n");
+	log("\n");
+	addDevice(device);
 	return 0;
 }
 
-void InputManager::FreeDevices()
+void InputManager::freeDevices()
 {
 	while (false == mDeviceList.empty()) {
-		RemoveDevice(*mDeviceList.begin());
+		removeDevice(*mDeviceList.begin());
 	}
 }
 
@@ -141,14 +141,14 @@ InputDeviceAbstract *InputManager::FindDeviceByPath(const char *device_path)
 	device_list_t::const_iterator it;
 
 	for (it = mDeviceList.begin(); it != mDeviceList.end(); it++) {
-		if (0 == strcmp((*it)->GetDevicePath(), device_path)) {
+		if (0 == strcmp((*it)->getDevicePath(), device_path)) {
 			return *it;
 		}
 	}
 	return NULL;
 }
 
-InputDeviceAbstract *InputManager::CreateDevice(const char *device_path)
+InputDeviceAbstract *InputManager::createDevice(const char *device_path)
 {
 	char *name;
 	InputDriverAbstract *driver = NULL;
@@ -177,7 +177,7 @@ InputDeviceAbstract *InputManager::CreateDevice(const char *device_path)
 		return NULL;
 	}
 
-	switch (driver->GetDeviceType()) {
+	switch (driver->getDeviceType()) {
 	case IDT_KEYBOARD:
 		device = new InputDeviceKeyboard(driver);
 		break;
@@ -202,13 +202,13 @@ InputDeviceAbstract *InputManager::CreateDevice(const char *device_path)
 		return NULL;
 	}
 
-	device->RegisterInputEventCallback(InputEventCallback, this);
-	device->RegisterDisconnetedEventCallback(DisconnetedEventCallback, this);
+	device->registerInputEventCallback(inputEventCallback, this);
+	device->registerDisconnetedEventCallback(disconnetedEventCallback, this);
 
 	return device;
 }
 
-void InputManager::AddDevice(InputDeviceAbstract *device)
+void InputManager::addDevice(InputDeviceAbstract *device)
 {
 	device_list_t::const_iterator it;
 
@@ -216,18 +216,18 @@ void InputManager::AddDevice(InputDeviceAbstract *device)
 		if (*it == device) {
 			return;
 		}
-		if (0 == strcmp(device->GetDevicePath(), (*it)->GetDevicePath())) {
+		if (0 == strcmp(device->getDevicePath(), (*it)->getDevicePath())) {
 			return;
 		}
 	}
 
-	device->RegisterInputEventCallback(InputEventCallback, this);
-	device->RegisterDisconnetedEventCallback(DisconnetedEventCallback, this);
+	device->registerInputEventCallback(inputEventCallback, this);
+	device->registerDisconnetedEventCallback(disconnetedEventCallback, this);
 
 	mDeviceList.push_back(device);
 }
 
-void InputManager::RemoveDevice(InputDeviceAbstract *device)
+void InputManager::removeDevice(InputDeviceAbstract *device)
 {
 	device_list_t::const_iterator it;
 
@@ -241,19 +241,19 @@ void InputManager::RemoveDevice(InputDeviceAbstract *device)
 		return;
 	}
 
-	device->RegisterInputEventCallback(NULL, NULL);
-	device->RegisterDisconnetedEventCallback(NULL, NULL);
+	device->registerInputEventCallback(NULL, NULL);
+	device->registerDisconnetedEventCallback(NULL, NULL);
 	mDeviceList.remove(device);
 	delete device;
 }
 
-int InputManager::Listen()
+int InputManager::listen()
 {
 	int ret;
 	InputDeviceAbstract *device;
 	device_list_t::const_iterator it;
 
-	ret = mInputSubsystem.Listen();
+	ret = mInputSubsystem.listen();
 	if (ret < 0) {
 		return -1;
 	}
@@ -262,16 +262,16 @@ int InputManager::Listen()
 	while (it != mDeviceList.end()) {
 		for (; it != mDeviceList.end(); it++) {
 			device = *it;
-			ret = device->Listen();
+			ret = device->listen();
 			if (ret < 0) {
-				Log("Listening device failed: %s(%s), %d\n\n", device->GetDeviceName(), device->GetDevicePath(), ret);
+				log("Listening device failed: %s(%s), %d\n\n", device->getDeviceName(), device->getDevicePath(), ret);
 				// Отключаем при ошибке
-				RemoveDevice(device);
+				removeDevice(device);
 				// Начинаем перебор сначала
 				ret = 2;
 			}
 			if (ret == 2) {
-				RemoveDevice(device);
+				removeDevice(device);
 				it = mDeviceList.begin();
 				break;
 			}
@@ -280,38 +280,60 @@ int InputManager::Listen()
 	return 0;
 }
 
-void InputManager::InputEventCallback(InputDeviceAbstract *device, InputDriverEventInput *event, void *data)
+int InputManager::getDeviceCount()
+{
+	return mDeviceList.size();
+}
+
+int InputManager::getDeviceList(InputDeviceAbstract **list, int *count)
+{
+	device_list_t::const_iterator it;
+	
+	if (NULL == list || NULL == count) {
+		return -1;
+	}
+	if (*count < getDeviceCount()) {
+		return -1;
+	}
+	*count = 0;
+	for (it = mDeviceList.begin(); it != mDeviceList.end(); it++) {
+		list[*count++] = *it;
+	}
+	return *count;
+}
+
+void InputManager::inputEventCallback(InputDeviceAbstract *device, InputDriverEventInput *event, void *data)
 {
 	InputManager *manager = (InputManager *) data;
-	manager->OnDeviceInput(device, event);
+	manager->onDeviceInput(device, event);
 }
 
-void InputManager::DisconnetedEventCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event, void *data)
+void InputManager::disconnetedEventCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event, void *data)
 {
 	InputManager *manager = (InputManager *) data;
-	manager->OnDeviceDisconneted(device, event);
+	manager->onDeviceDisconneted(device, event);
 }
 
-void InputManager::OnDeviceInput(InputDeviceAbstract *device, InputDriverEventInput *event)
+void InputManager::onDeviceInput(InputDeviceAbstract *device, InputDriverEventInput *event)
 {
-	FireInputCallback(device, event);
+	fireInputCallback(device, event);
 }
 
-void InputManager::OnDeviceDisconneted(InputDeviceAbstract *device, InputDriverEventDisconnected *event)
+void InputManager::onDeviceDisconneted(InputDeviceAbstract *device, InputDriverEventDisconnected *event)
 {
-	printf("DEVICE DISCONNECTED: [%s]!!!\n", device->GetDeviceName());
-	FireDisconnetedCallback(device, event);
-	RemoveDevice(device);
+	log("DEVICE DISCONNECTED: [%s]!!!\n", device->getDeviceName());
+	fireDisconnetedCallback(device, event);
+	removeDevice(device);
 }
 
-void InputManager::InputSubsystemConnectedCallback(InputSubsystem *system, InputSubsystemEventConnected *event, void *data)
+void InputManager::inputSubsystemConnectedCallback(InputSubsystem *system, InputSubsystemEventConnected *event, void *data)
 {
 	InputManager *self = (InputManager *) data;
 	char *name;
 	std::string device_name, device_path;
 	std::list<std::string>::iterator it;
 
-	printf("DEVICE CONNECTED: [%s]!!!\n", event->path);
+	self->log("DEVICE CONNECTED: [%s]!!!\n", event->path);
 
 	name = strrchr((char *) event->path, '/');
 	if (NULL == name) {
@@ -331,11 +353,11 @@ void InputManager::InputSubsystemConnectedCallback(InputSubsystem *system, Input
 		device_path.append("/");
 		device_path.append(device_name);
 
-		self->ReadDevice(device_path.c_str());
+		self->readDevice(device_path.c_str());
 	}
 }
 
-void InputManager::InputSubsystemDisconnectedCallback(InputSubsystem *system, InputSubsystemEventDisconnected *event, void *data)
+void InputManager::inputSubsystemDisconnectedCallback(InputSubsystem *system, InputSubsystemEventDisconnected *event, void *data)
 {
 	InputManager *self = (InputManager *) data;
 	char *name;
@@ -343,7 +365,7 @@ void InputManager::InputSubsystemDisconnectedCallback(InputSubsystem *system, In
 	std::list<std::string>::iterator it;
 	InputDeviceAbstract *device;
 
-	printf("DEVICE DISCONNECTED: [%s]!!!\n", event->path);
+	self->log("DEVICE DISCONNECTED: [%s]!!!\n", event->path);
 
 	name = strrchr((char *) event->path, '/');
 	if (NULL == name) {
@@ -366,26 +388,26 @@ void InputManager::InputSubsystemDisconnectedCallback(InputSubsystem *system, In
 
 		device = self->FindDeviceByPath(device_path.c_str());
 		if (device) {
-			self->RemoveDevice(device);
+			self->removeDevice(device);
 		}
 	}
 }
 
-int InputManager::RegisterInputCallback(InputDeviceInputCallback callback, void *data)
+int InputManager::registerInputCallback(InputDeviceInputCallback callback, void *data)
 {
 	mOnDeviceInput = callback;
 	mOnDeviceInputData = data;
 	return 0;
 }
 
-int InputManager::RegisterDisconnetedCallback(InputDeviceDisconnectedCallback callback, void *data)
+int InputManager::registerDisconnetedCallback(InputDeviceDisconnectedCallback callback, void *data)
 {
 	mOnDeviceDisconnected = callback;
 	mOnDeviceDisconnectedData = data;
 	return 0;
 }
 
-int InputManager::FireInputCallback(InputDeviceAbstract *device, InputDriverEventInput *event)
+int InputManager::fireInputCallback(InputDeviceAbstract *device, InputDriverEventInput *event)
 {
 	if (mOnDeviceInput) {
 		if (!event->time.tv_sec && !event->time.tv_usec) {
@@ -396,7 +418,7 @@ int InputManager::FireInputCallback(InputDeviceAbstract *device, InputDriverEven
 	return 0;
 }
 
-int InputManager::FireDisconnetedCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event)
+int InputManager::fireDisconnetedCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event)
 {
 	if (mOnDeviceDisconnected) {
 		if (!event->time.tv_sec && !event->time.tv_usec) {

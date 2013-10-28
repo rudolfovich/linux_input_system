@@ -16,10 +16,12 @@ InputDeviceJoystic::~InputDeviceJoystic()
 {
 }
 
-int InputDeviceJoystic::Initialize()
+int InputDeviceJoystic::initialize()
 {
+	return 0;
 }
 
-int InputDeviceJoystic::Finalize()
+int InputDeviceJoystic::finalize()
 {
+	return 0;
 }

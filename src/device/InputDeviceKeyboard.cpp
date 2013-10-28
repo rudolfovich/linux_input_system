@@ -16,10 +16,12 @@ InputDeviceKeyboard::~InputDeviceKeyboard()
 {
 }
 
-int InputDeviceKeyboard::Initialize()
+int InputDeviceKeyboard::initialize()
 {
+	return 0;
 }
 
-int InputDeviceKeyboard::Finalize()
+int InputDeviceKeyboard::finalize()
 {
+	return 0;
 }

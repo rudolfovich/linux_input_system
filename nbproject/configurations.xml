@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="90">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="build">
+        <df name="src">
+          <df name="olis">
+            <in>InputSystem.h</in>
+          </df>
+        </df>
+      </df>
+      <df name="include">
+        <df name="device">
+          <in>InputDeviceAbstract.h</in>
+          <in>InputDeviceJoystic.h</in>
+          <in>InputDeviceKeyboard.h</in>
+          <in>InputDeviceMouse.h</in>
+          <in>InputDeviceRemoteControl.h</in>
+        </df>
+        <df name="driver">
+          <in>InputDriverAbstract.h</in>
+          <in>InputDriverEvdev.h</in>
+        </df>
+        <df name="manager">
+          <in>InputManager.h</in>
+        </df>
+        <df name="system">
+          <in>InputSubsystem.h</in>
+          <in>InputTypes.h</in>
+        </df>
+      </df>
+      <df name="src">
+        <df name="device">
+          <in>InputDeviceAbstract.cpp</in>
+          <in>InputDeviceJoystic.cpp</in>
+          <in>InputDeviceKeyboard.cpp</in>
+          <in>InputDeviceMouse.cpp</in>
+          <in>InputDeviceRemoteControl.cpp</in>
+        </df>
+        <df name="driver">
+          <in>InputDriverAbstract.cpp</in>
+          <in>InputDriverEvdev.cpp</in>
+        </df>
+        <df name="manager">
+          <in>InputManager.cpp</in>
+        </df>
+        <df name="system">
+          <in>InputSubsystem.cpp</in>
+          <in>InputTypes.cpp</in>
+        </df>
+        <in>main.cpp</in>
+        <in>newfile.c</in>
+        <in>newfile.h</in>
+      </df>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Важные файлы"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>build/Makefile</itemPath>
+      <itemPath>configure</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>build/Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>false</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>build</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath>build/src/inputsystemtest</executablePath>
+          <ccTool>
+            <incDir>
+              <pElem>build/src</pElem>
+              <pElem>src</pElem>
+              <pElem>build</pElem>
+              <pElem>include</pElem>
+            </incDir>
+            <preprocessorList>
+              <Elem>HAVE_CONFIG_H</Elem>
+              <Elem>PIC</Elem>
+            </preprocessorList>
+          </ccTool>
+        </makeTool>
+      </makefileType>
+      <item path="build/src/olis/InputSystem.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/device/InputDeviceAbstract.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/device/InputDeviceJoystic.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/device/InputDeviceKeyboard.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/device/InputDeviceMouse.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/device/InputDeviceRemoteControl.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/driver/InputDriverAbstract.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="include/driver/InputDriverEvdev.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/manager/InputManager.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/system/InputSubsystem.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/system/InputTypes.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/device/InputDeviceAbstract.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/device/InputDeviceJoystic.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/device/InputDeviceKeyboard.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/device/InputDeviceMouse.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/device/InputDeviceRemoteControl.cpp"
+            ex="false"
+            tool="1"
+            flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/driver/InputDriverAbstract.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/driver/InputDriverEvdev.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/main.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/manager/InputManager.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/newfile.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/newfile.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/system/InputSubsystem.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+      <item path="src/system/InputTypes.cpp" ex="false" tool="1" flavor2="4">
+        <ccTool>
+        </ccTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

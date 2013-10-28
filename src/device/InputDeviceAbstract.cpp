@@ -7,7 +7,6 @@
 
 #include "../../include/device/InputDeviceAbstract.h"
 #include "../../include/driver/InputDriverAbstract.h"
-#include <stdlib.h>
 
 InputDeviceAbstract::InputDeviceAbstract(InputDriverAbstract *device)
 	: mDeviceDriver(device)
@@ -16,8 +15,8 @@ InputDeviceAbstract::InputDeviceAbstract(InputDriverAbstract *device)
 	, mEventDisconnectedCallback(NULL)
 	, mEventDisconnectedCallbackData(NULL)
 {
-	device->RegisterInputEventCallback(InputEventCallback, this);
-	device->RegisterDisconnetedEventCallback(DisconnetedEventCallback, this);
+	device->registerInputEventCallback(inputEventCallback, this);
+	device->registerDisconnetedEventCallback(disconnetedEventCallback, this);
 }
 
 InputDeviceAbstract::~InputDeviceAbstract()
@@ -25,38 +24,39 @@ InputDeviceAbstract::~InputDeviceAbstract()
 	delete mDeviceDriver;
 }
 
-int InputDeviceAbstract::Validate() const
+int InputDeviceAbstract::validate() const
 {
-	return mDeviceDriver->Validate();
+	return mDeviceDriver->validate();
 }
 
-InputDeviceType InputDeviceAbstract::GetDeviceType() const
+InputDeviceType InputDeviceAbstract::getDeviceType() const
 {
-	return mDeviceDriver->GetDeviceType();
+	return mDeviceDriver->getDeviceType();
 }
 
-const char *InputDeviceAbstract::GetDevicePath() const
+const char *InputDeviceAbstract::getDevicePath() const
 {
-	return mDeviceDriver->GetDevicePath();
+	return mDeviceDriver->getDevicePath();
 }
 
-const char *InputDeviceAbstract::GetDeviceName() const
+const char *InputDeviceAbstract::getDeviceName() const
 {
-	return mDeviceDriver->GetDeviceName();
+	return mDeviceDriver->getDeviceName();
 }
 
-int InputDeviceAbstract::Listen()
+int InputDeviceAbstract::listen()
 {
-	return mDeviceDriver->Listen();
+	return mDeviceDriver->listen();
 }
 
-int InputDeviceAbstract::RegisterInputEventCallback(InputDeviceInputCallback callback, void *data)
+int InputDeviceAbstract::registerInputEventCallback(InputDeviceInputCallback callback, void *data)
 {
 	mEventInputCallback = callback;
 	mEventInputCallbackData = data;
+	return 0;
 }
 
-int InputDeviceAbstract::FireInputEventCallback(InputDriverEventInput *event)
+int InputDeviceAbstract::fireInputEventCallback(InputDriverEventInput *event)
 {
 	if (mEventInputCallback) {
 		mEventInputCallback(this, event, mEventInputCallbackData);
@@ -64,13 +64,14 @@ int InputDeviceAbstract::FireInputEventCallback(InputDriverEventInput *event)
 	return 0;
 }
 
-int InputDeviceAbstract::RegisterDisconnetedEventCallback(InputDeviceDisconnectedCallback callback, void *data)
+int InputDeviceAbstract::registerDisconnetedEventCallback(InputDeviceDisconnectedCallback callback, void *data)
 {
 	mEventDisconnectedCallback = callback;
 	mEventDisconnectedCallbackData = data;
+	return 0;
 }
 
-int InputDeviceAbstract::FireDisconnetedEventCallback(InputDriverEventDisconnected *event)
+int InputDeviceAbstract::fireDisconnetedEventCallback(InputDriverEventDisconnected *event)
 {
 	if (mEventDisconnectedCallback) {
 		mEventDisconnectedCallback(this, event, mEventDisconnectedCallbackData);
@@ -78,14 +79,14 @@ int InputDeviceAbstract::FireDisconnetedEventCallback(InputDriverEventDisconnect
 	return 0;
 }
 
-void InputDeviceAbstract::InputEventCallback(InputDriverAbstract *driver, InputDriverEventInput *event, void *data)
+void InputDeviceAbstract::inputEventCallback(InputDriverAbstract *driver, InputDriverEventInput *event, void *data)
 {
 	InputDeviceAbstract *device = (InputDeviceAbstract *) data;
-	device->FireInputEventCallback(event);
+	device->fireInputEventCallback(event);
 }
 
-void InputDeviceAbstract::DisconnetedEventCallback(InputDriverAbstract *driver, InputDriverEventDisconnected *event, void *data)
+void InputDeviceAbstract::disconnetedEventCallback(InputDriverAbstract *driver, InputDriverEventDisconnected *event, void *data)
 {
 	InputDeviceAbstract *device = (InputDeviceAbstract *) data;
-	device->FireDisconnetedEventCallback(event);
+	device->fireDisconnetedEventCallback(event);
 }

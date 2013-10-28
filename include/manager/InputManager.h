@@ -5,8 +5,8 @@
  * Created on 25 Июль 2013 г., 18:40
  */
 
-#ifndef INPUTMANAGER_H
-#define	INPUTMANAGER_H
+#ifndef __INPUT_MANAGER_H_INC__
+#define	__INPUT_MANAGER_H_INC__
 
 #include <list>
 #include <map>
@@ -23,41 +23,45 @@ public:
 	virtual ~InputManager();
 
 public:
-	virtual int Initialize();
-	virtual int Finalize();
-	virtual int Listen();
+	virtual int initialize();
+	virtual int finalize();
+	virtual int listen();
+
+public:
+	virtual int getDeviceCount();
+	virtual int getDeviceList(InputDeviceAbstract **list, int *count);
+
+public:
+	virtual int registerInputCallback(InputDeviceInputCallback callback, void *data);
+	virtual int registerDisconnetedCallback(InputDeviceDisconnectedCallback callback, void *data);
+
+protected:
+	void log(const char *fmt, ...);
 	
 protected:
-	void Log(const char *fmt, ...);
+	virtual int readDeviceList(const char *directory);
+	virtual int readDevice(const char *device_path);
+	virtual void freeDevices();
 	
 protected:
-	virtual int ReadDeviceList(const char *directory);
-	virtual int ReadDevice(const char *device_path);
-	virtual void FreeDevices();
-	
-protected:
-	virtual InputDeviceAbstract *CreateDevice(const char *device_path);
-	virtual void AddDevice(InputDeviceAbstract *device);
-	virtual void RemoveDevice(InputDeviceAbstract *device);
+	virtual InputDeviceAbstract *createDevice(const char *device_path);
+	virtual void addDevice(InputDeviceAbstract *device);
+	virtual void removeDevice(InputDeviceAbstract *device);
 	virtual InputDeviceAbstract *FindDeviceByPath(const char* device_path);
 
 protected:
-	static void InputEventCallback(InputDeviceAbstract *device, InputDriverEventInput *event, void *data);
-	static void DisconnetedEventCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event, void *data);
-	static void InputSubsystemConnectedCallback(InputSubsystem *system, InputSubsystemEventConnected *event, void *data);
-	static void InputSubsystemDisconnectedCallback(InputSubsystem *system, InputSubsystemEventDisconnected *event, void *data);
+	static void inputEventCallback(InputDeviceAbstract *device, InputDriverEventInput *event, void *data);
+	static void disconnetedEventCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event, void *data);
+	static void inputSubsystemConnectedCallback(InputSubsystem *system, InputSubsystemEventConnected *event, void *data);
+	static void inputSubsystemDisconnectedCallback(InputSubsystem *system, InputSubsystemEventDisconnected *event, void *data);
 
 protected:
-	virtual void OnDeviceInput(InputDeviceAbstract *device, InputDriverEventInput *event);
-	virtual void OnDeviceDisconneted(InputDeviceAbstract *device, InputDriverEventDisconnected *event);
-	
-public:
-	virtual int RegisterInputCallback(InputDeviceInputCallback callback, void *data);
-	virtual int RegisterDisconnetedCallback(InputDeviceDisconnectedCallback callback, void *data);
+	virtual void onDeviceInput(InputDeviceAbstract *device, InputDriverEventInput *event);
+	virtual void onDeviceDisconneted(InputDeviceAbstract *device, InputDriverEventDisconnected *event);
 
 protected:	
-	virtual int FireInputCallback(InputDeviceAbstract *device, InputDriverEventInput *event);
-	virtual int FireDisconnetedCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event);
+	virtual int fireInputCallback(InputDeviceAbstract *device, InputDriverEventInput *event);
+	virtual int fireDisconnetedCallback(InputDeviceAbstract *device, InputDriverEventDisconnected *event);
 
 protected:
 	typedef std::list<InputDeviceAbstract *>	device_list_t;
@@ -74,7 +78,7 @@ protected:
 	void *								mOnDeviceDisconnectedData;
 };
 
-#endif	/* INPUTMANAGER_H */
+#endif	/* __INPUT_MANAGER_H_INC__ */
 
 /*
  * enum device list

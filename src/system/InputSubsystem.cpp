@@ -56,10 +56,10 @@ InputSubsystem::InputSubsystem()
 
 InputSubsystem::~InputSubsystem()
 {
-	Finalize();
+	finalize();
 }
 
-int InputSubsystem::Initialize()
+int InputSubsystem::initialize()
 {
 	int result = 0;
 	struct sockaddr_nl snl;
@@ -87,7 +87,7 @@ int InputSubsystem::Initialize()
 	return 0;
 }
 
-int InputSubsystem::Finalize()
+int InputSubsystem::finalize()
 {
 	if (mNetlinkSocket != -1) {
 		close(mNetlinkSocket);
@@ -101,7 +101,7 @@ int InputSubsystem::Finalize()
 	return 0;
 }
 
-int InputSubsystem::Listen()
+int InputSubsystem::listen()
 {
 	ssize_t received;
 	int select_result;
@@ -131,14 +131,14 @@ int InputSubsystem::Listen()
 			return -1;
 		}
 		if (mNetlinkMsgBufferRecieved) {
-			ParseMessage();
+			parseMessage();
 		}
 	}
 	while (received > 0);
 	return 0;
 }
 
-int InputSubsystem::ParseMessage()
+int InputSubsystem::parseMessage()
 {
 	char *at, *type, *device;
 	long cnt, len;
@@ -187,56 +187,58 @@ int InputSubsystem::ParseMessage()
 		return 0;
 	}
 	
-	return OnMessage(type, device);
+	return onMessage(type, device);
 }
 
-int InputSubsystem::OnMessage(const char *type, const char *device)
+int InputSubsystem::onMessage(const char *type, const char *device)
 {
 	if (0 == strcmp(mNetlinkMsgBuffer, "add")) {
-		return OnMessageAdd(device);
+		return onMessageAdd(device);
 	}
 	if (0 == strcmp(mNetlinkMsgBuffer, "remove")) {
-		return OnMessageRemove(device);
+		return onMessageRemove(device);
 	}
 	printf("Kernel message of unknown type: [%s] [%s]\n", type, device);
 	return 1;
 }
 
-int InputSubsystem::OnMessageAdd(const char *device)
+int InputSubsystem::onMessageAdd(const char *device)
 {
 	printf(" + [/sys%s]\n", device);
 	InputSubsystemEventConnected event;
 	event.path = device;
 	event.time.tv_sec = 0;
 	event.time.tv_usec = 0;
-	FireConnectedCallback(&event);
+	fireConnectedCallback(&event);
+	return 0;
 }
 
-int InputSubsystem::OnMessageRemove(const char *device)
+int InputSubsystem::onMessageRemove(const char *device)
 {
 	printf(" - [/sys%s]\n", device);
 	InputSubsystemEventConnected event;
 	event.path = device;
 	event.time.tv_sec = 0;
 	event.time.tv_usec = 0;
-	FireConnectedCallback(&event);
+	fireConnectedCallback(&event);
+	return 0;
 }
 
-int InputSubsystem::RegisterConnectedCallback(InputSubsystemConnectedCallback callback, void *data)
+int InputSubsystem::registerConnectedCallback(InputSubsystemConnectedCallback callback, void *data)
 {
 	mOnConnected = callback;
 	mOnConnectedData = data;
 	return 0;
 }
 
-int InputSubsystem::RegisterDisconnectedCallback(InputSubsystemDisconnectedCallback callback, void *data)
+int InputSubsystem::registerDisconnectedCallback(InputSubsystemDisconnectedCallback callback, void *data)
 {
 	mOnDisconnected = callback;
 	mOnDisconnectedData = data;
 	return 0;
 }
 
-int InputSubsystem::FireConnectedCallback(InputSubsystemEventConnected *event)
+int InputSubsystem::fireConnectedCallback(InputSubsystemEventConnected *event)
 {
 	if (mOnConnected) {
 		if (!event->time.tv_sec && !event->time.tv_usec) {
@@ -247,7 +249,7 @@ int InputSubsystem::FireConnectedCallback(InputSubsystemEventConnected *event)
 	return 0;
 }
 
-int InputSubsystem::FireDisconnectedCallback(InputSubsystemEventDisconnected *event)
+int InputSubsystem::fireDisconnectedCallback(InputSubsystemEventDisconnected *event)
 {
 	if (mOnDisconnected) {
 		if (!event->time.tv_sec && !event->time.tv_usec) {

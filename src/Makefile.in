@@ -14,6 +14,9 @@
 
 @SET_MAKE@
 
+# what flags you want to pass to the C compiler & linker
+
+
 
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
@@ -80,7 +83,7 @@ POST_UNINSTALL = :
 bin_PROGRAMS = inputsystemtest$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/depcomp
+	$(top_srcdir)/depcomp $(libinputsystem_a_HEADERS)
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -116,7 +119,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(libinputsystem_adir)"
 LIBRARIES = $(lib_LIBRARIES)
 AR = ar
 ARFLAGS = cru
@@ -177,6 +181,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+HEADERS = $(libinputsystem_a_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -206,9 +211,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-
-# what flags you want to pass to the C compiler & linker
-CFLAGS = --pedantic -Wall -std=c99 -O2
+CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
@@ -291,12 +294,25 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_LDFLAGS = -lrt
-AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include -O2 -std=c++98 -fPIC -DPIC --pedantic -Wall -Wreturn-type -Wno-reorder 
+AM_LDFLAGS = -lrt 
 lib_LIBRARIES = libinputsystem.a
-libinputsystem_a_SOURCES = system/InputTypes.cpp system/InputSubsystem.cpp driver/InputDriverAbstract.cpp driver/InputDriverEvdev.cpp device/InputDeviceAbstract.cpp device/InputDeviceJoystic.cpp device/InputDeviceKeyboard.cpp device/InputDeviceMouse.cpp device/InputDeviceRemoteControl.cpp manager/InputManager.cpp
+libinputsystem_a_SOURCES = \
+	system/InputTypes.cpp \
+	system/InputSubsystem.cpp \
+	driver/InputDriverAbstract.cpp \
+	driver/InputDriverEvdev.cpp \
+	device/InputDeviceAbstract.cpp \
+	device/InputDeviceJoystic.cpp \
+	device/InputDeviceKeyboard.cpp \
+	device/InputDeviceMouse.cpp \
+	device/InputDeviceRemoteControl.cpp \
+	manager/InputManager.cpp
+
+libinputsystem_adir = LIS
+libinputsystem_a_HEADERS = ../include/InputSystem.h ../include/driver/InputDriverEvdev.h ../include/driver/InputDriverAbstract.h ../include/manager/InputManager.h ../include/system/InputSubsystem.h ../include/system/InputTypes.h ../include/device/InputDeviceMouse.h ../include/device/InputDeviceRemoteControl.h ../include/device/InputDeviceAbstract.h ../include/device/InputDeviceJoystic.h ../include/device/InputDeviceKeyboard.h 
 inputsystemtest_LDADD = libinputsystem.a
-inputsystemtest_SOURCES = main.cpp # system/InputTypes.cpp system/InputSubsystem.cpp driver/InputDriverAbstract.cpp driver/InputDriverEvdev.cpp device/InputDeviceAbstract.cpp device/InputDeviceJoystic.cpp device/InputDeviceKeyboard.cpp device/InputDeviceMouse.cpp device/InputDeviceRemoteControl.cpp manager/InputManager.cpp
+inputsystemtest_SOURCES = main.cpp
 all: all-am
 
 .SUFFIXES:
@@ -585,6 +601,27 @@ InputManager.obj: manager/InputManager.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='manager/InputManager.cpp' object='InputManager.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o InputManager.obj `if test -f 'manager/InputManager.cpp'; then $(CYGPATH_W) 'manager/InputManager.cpp'; else $(CYGPATH_W) '$(srcdir)/manager/InputManager.cpp'; fi`
+install-libinputsystem_aHEADERS: $(libinputsystem_a_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(libinputsystem_a_HEADERS)'; test -n "$(libinputsystem_adir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libinputsystem_adir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libinputsystem_adir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(libinputsystem_adir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(libinputsystem_adir)" || exit $$?; \
+	done
+
+uninstall-libinputsystem_aHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(libinputsystem_a_HEADERS)'; test -n "$(libinputsystem_adir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(libinputsystem_adir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -670,9 +707,9 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES) $(PROGRAMS)
+all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libinputsystem_adir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -728,7 +765,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-libinputsystem_aHEADERS
 
 install-dvi: install-dvi-am
 
@@ -773,7 +810,8 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-libLIBRARIES
+uninstall-am: uninstall-binPROGRAMS uninstall-libLIBRARIES \
+	uninstall-libinputsystem_aHEADERS
 
 .MAKE: install-am install-strip
 
@@ -784,13 +822,14 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLIBRARIES
 	html-am info info-am install install-am install-binPROGRAMS \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLIBRARIES install-man \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-binPROGRAMS \
-	uninstall-libLIBRARIES
+	install-info install-info-am install-libLIBRARIES \
+	install-libinputsystem_aHEADERS install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binPROGRAMS uninstall-libLIBRARIES \
+	uninstall-libinputsystem_aHEADERS
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

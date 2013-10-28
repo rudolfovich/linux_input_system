@@ -12,8 +12,9 @@
 #include <stdint.h>
 #include <memory.h>
 
-
-#define test_bit(bit, array)  (array [bit / 8] & (1 << (bit % 8)))
+#define bit_test(bit, array)   (array [bit / 8] &  (1 << (bit % 8)))
+#define bit_set(bit, array)    (array [bit / 8] |= (1 << (bit % 8)))
+#define bit_unset(bit, array)  (array [bit / 8] ^= (1 << (bit % 8)))
 
 InputDriverEvdev::InputDriverEvdev(const char *device_path)
 	: InputDriverAbstract(device_path)
@@ -21,48 +22,48 @@ InputDriverEvdev::InputDriverEvdev(const char *device_path)
 	mAsyncIOEventBufferSize = sizeof (mInputEvent);
 	mAsyncIOEventBuffer = &mInputEvent;
 
-	Initialize();
+	initialize();
 }
 
 InputDriverEvdev::~InputDriverEvdev()
 {
-	Finalize();
+	finalize();
 }
 
-int InputDriverEvdev::OpenDevice()
+int InputDriverEvdev::openDevice()
 {
 	int ret;
 
-	ret = InputDriverAbstract::OpenDevice();
+	ret = InputDriverAbstract::openDevice();
 	if (ret < 0) {
 		perror("open device");
-		CloseDevice();
+		closeDevice();
 		return -1;
 	}
-	ret = ReadDeviceInfo();
+	ret = readDeviceInfo();
 	if (ret < 0) {
 		perror("open device read info");
-		CloseDevice();
+		closeDevice();
 		return -1;
 	}
-	ret = ReadSupportedEvents();
+	ret = readSupportedEvents();
 	if (ret < 0) {
 		perror("open device read events");
-		CloseDevice();
+		closeDevice();
 		return -1;
 	}
-	ret = ReadCapabilities();
+	ret = readCapabilities();
 	if (ret < 0) {
 		perror("open device read caps");
-		CloseDevice();
+		closeDevice();
 		return -1;
 	}
 	return 0;
 }
 
-int InputDriverEvdev::ReadDeviceInfo()
+int InputDriverEvdev::readDeviceInfo()
 {
-	int i, ret;
+	int ret;
 	uint32_t version = 0;
 	struct input_id device_info;
 	char device_name[256] = "<unknown>";
@@ -192,7 +193,7 @@ int InputDriverEvdev::ReadDeviceInfo()
 	return 0;
 }
 
-int InputDriverEvdev::ReadSupportedEvents()
+int InputDriverEvdev::readSupportedEvents()
 {
 	int i, ret;
 
@@ -206,7 +207,7 @@ int InputDriverEvdev::ReadSupportedEvents()
 	}
 	printf("  - Supported event types:\n");
 	for (i = 0; i < EV_MAX; i++) {
-		if (test_bit(i, mEventMask)) {
+		if (bit_test(i, mEventMask)) {
 			/* the bit is set in the event types list */
 			printf("       - Event type 0x%02x ", i);
 			switch (i) {
@@ -266,7 +267,7 @@ int InputDriverEvdev::ReadSupportedEvents()
 	return 0;
 }
 
-int InputDriverEvdev::ReadCapabilities()
+int InputDriverEvdev::readCapabilities()
 {
 	int i, ret;
 
@@ -284,7 +285,7 @@ int InputDriverEvdev::ReadCapabilities()
 	else {
 		printf("  - keys pressed: \n");
 		for (i = 0; i < KEY_MAX; i++) {
-			if (test_bit(i, mKeyMask)) {
+			if (bit_test(i, mKeyMask)) {
 				printf("  Key 0x%02x \n", i);
 			}
 		}
@@ -298,7 +299,7 @@ int InputDriverEvdev::ReadCapabilities()
 		else {
 			printf("  - detected keys:  ");
 			for (i = 0; i < KEY_MAX; i++) {
-				if (test_bit(i, mKeyMask))
+				if (bit_test(i, mKeyMask))
 					printf("%d, ", i);
 			}
 			printf("\n");
@@ -312,7 +313,7 @@ int InputDriverEvdev::ReadCapabilities()
 		else {
 			printf("  - detected rels:  ");
 			for (i = 0; i < REL_MAX; i++) {
-				if (test_bit(i, mRelMask))
+				if (bit_test(i, mRelMask))
 					printf("%d, ", i);
 			}
 			printf("\n");
@@ -326,7 +327,7 @@ int InputDriverEvdev::ReadCapabilities()
 		else {
 			printf("  - detected abs:  ");
 			for (i = 0; i < ABS_MAX; i++) {
-				if (test_bit(i, mAbsMask))
+				if (bit_test(i, mAbsMask))
 					printf("%d, ", i);
 			}
 			printf("\n");
@@ -353,7 +354,7 @@ int InputDriverEvdev::ReadCapabilities()
 		else {
 			printf("  - detected leds:  ");
 			for (i = 0; i < LED_MAX; i++) {
-				if (test_bit(i, mLedMask))
+				if (bit_test(i, mLedMask))
 					printf("%d, ", i);
 			}
 			printf("\n");
@@ -369,7 +370,7 @@ int InputDriverEvdev::ReadCapabilities()
 	return 0;
 }
 
-int InputDriverEvdev::ProcessEvent()
+int InputDriverEvdev::processEvent()
 {
 	if (mInputEvent.type == EV_SYN) {
 		return 0;
@@ -385,17 +386,17 @@ int InputDriverEvdev::ProcessEvent()
 		break;
 	case EV_KEY:
 		mLastInputEvent.type = IDET_KEY;
-		ProcessKey();
+		processKey();
 		//printf(" - EV_KEY: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_REL:
 		mLastInputEvent.type = IDET_REL;
-		ProcessRel();
+		processRel();
 		//printf(" - EV_REL: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_ABS:
 		mLastInputEvent.type = IDET_ABS;
-		ProcessAbs();
+		processAbs();
 		//printf(" - EV_ABS: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_MSC:
@@ -409,6 +410,7 @@ int InputDriverEvdev::ProcessEvent()
 	case EV_LED:
 		mLastInputEvent.type = IDET_LED;
 		//printf(" - EV_LED: %d : %d", mInputEvent.code, mInputEvent.value);
+		processLed();
 		break;
 	case EV_SND:
 		mLastInputEvent.type = IDET_SND;
@@ -440,97 +442,117 @@ int InputDriverEvdev::ProcessEvent()
 	return 0;
 }
 
-bool InputDriverEvdev::HasKeysKeyboard()
+bool InputDriverEvdev::isKeyPressed(keyvalue_t key)
 {
-	if (false == test_bit(KEY_1, mKeyMask)) return false;
-	if (false == test_bit(KEY_0, mKeyMask)) return false;
-	if (false == test_bit(KEY_A, mKeyMask)) return false;
-	if (false == test_bit(KEY_Z, mKeyMask)) return false;
-	if (false == test_bit(KEY_ENTER, mKeyMask)) return false;
-	if (false == test_bit(KEY_ESC, mKeyMask)) return false;
-	if (false == test_bit(KEY_LEFTALT, mKeyMask)) return false;
-	if (false == test_bit(KEY_LEFTCTRL, mKeyMask)) return false;
-	if (false == test_bit(KEY_LEFTSHIFT, mKeyMask)) return false;
+	return bit_test(key, mKeyPressedMask);
+}
+
+bool InputDriverEvdev::isLedOn(keyvalue_t led)
+{
+	return bit_test(led, mLedOnMask);
+}
+
+bool InputDriverEvdev::hasKeysKeyboard()
+{
+	if (false == bit_test(KEY_1, mKeyMask)) return false;
+	if (false == bit_test(KEY_0, mKeyMask)) return false;
+	if (false == bit_test(KEY_A, mKeyMask)) return false;
+	if (false == bit_test(KEY_Z, mKeyMask)) return false;
+	if (false == bit_test(KEY_ENTER, mKeyMask)) return false;
+	if (false == bit_test(KEY_ESC, mKeyMask)) return false;
+	if (false == bit_test(KEY_LEFTALT, mKeyMask)) return false;
+	if (false == bit_test(KEY_LEFTCTRL, mKeyMask)) return false;
+	if (false == bit_test(KEY_LEFTSHIFT, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysMouse()
+bool InputDriverEvdev::hasKeysMouse()
 {
-	if (!test_bit(BTN_MOUSE, mKeyMask)) return false;
+	if (!bit_test(BTN_MOUSE, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysJoystic()
+bool InputDriverEvdev::hasKeysJoystic()
 {
-	if (!test_bit(BTN_JOYSTICK, mKeyMask)) return false;
+	if (!bit_test(BTN_JOYSTICK, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysGamepad()
+bool InputDriverEvdev::hasKeysGamepad()
 {
-	if (!test_bit(BTN_GAMEPAD, mKeyMask)) return false;
+	if (!bit_test(BTN_GAMEPAD, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysRemoteControl()
+bool InputDriverEvdev::hasKeysRemoteControl()
 {
-	if (!test_bit(KEY_NUMERIC_0, mKeyMask)) return false;
+	if (!bit_test(KEY_NUMERIC_0, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysWheel()
+bool InputDriverEvdev::hasKeysWheel()
 {
-	if (!test_bit(BTN_WHEEL, mKeyMask)) return false;
+	if (!bit_test(BTN_WHEEL, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysGraphicsTablet()
+bool InputDriverEvdev::hasKeysGraphicsTablet()
 {
-	if (!test_bit(BTN_DIGI, mKeyMask)) return false;
+	if (!bit_test(BTN_DIGI, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasKeysTrackpad()
+bool InputDriverEvdev::hasKeysTrackpad()
 {
-	if (!test_bit(BTN_TOOL_DOUBLETAP, mKeyMask)) return false;
+	if (!bit_test(BTN_TOOL_DOUBLETAP, mKeyMask)) return false;
 	return true;
 }
 
-bool InputDriverEvdev::HasAbsolute()
+bool InputDriverEvdev::hasAbsolute()
 {
 	for (int i = 0; i < ABS_MAX; i++) {
-		if (test_bit(i, mAbsMask)) return true;
+		if (bit_test(i, mAbsMask)) return true;
 	}
 	return false;
 }
 
-bool InputDriverEvdev::HasRelative()
+bool InputDriverEvdev::hasRelative()
 {
 	for (int i = 0; i < REL_MAX; i++) {
-		if (test_bit(i, mRelMask)) return true;
+		if (bit_test(i, mRelMask)) return true;
 	}
 	return false;
 }
 
-bool InputDriverEvdev::HasRepeater()
+bool InputDriverEvdev::hasRepeater()
 {
 	return (mSupportedEvents & IDET_REP) ? true : false;
 }
 
-bool InputDriverEvdev::HasLed()
+bool InputDriverEvdev::hasLed()
 {
 	for (int i = 0; i < LED_MAX; i++) {
-		if (test_bit(i, mLedMask)) return true;
+		if (bit_test(i, mLedMask)) return true;
 	}
 	return false;
 }
 
-int InputDriverEvdev::ProcessKey()
+int InputDriverEvdev::processKey()
 {
-	
+	if (mLastInputEvent.type == IDET_KEY) {
+		switch (mLastInputEvent.value) {
+		case 1:
+			bit_set(mLastInputEvent.code, mKeyPressedMask);
+			break;
+		case 0:
+			bit_unset(mLastInputEvent.code, mKeyPressedMask);
+			break;
+		}
+	}
+	return 0;
 }
 
-int InputDriverEvdev::ProcessAbs()
+int InputDriverEvdev::processAbs()
 {
 	switch (mLastInputEvent.code) {
 	case ABS_X:
@@ -659,9 +681,10 @@ int InputDriverEvdev::ProcessAbs()
 		break;
 #endif
 	}
+	return 0;
 }
 
-int InputDriverEvdev::ProcessRel()
+int InputDriverEvdev::processRel()
 {
 	switch (mLastInputEvent.code) {
 	case REL_X:
@@ -695,4 +718,20 @@ int InputDriverEvdev::ProcessRel()
 		mLastInputEvent.code = IDR_MISC;
 		break;
 	}
+	return 0;
+}
+
+int InputDriverEvdev::processLed()
+{
+	if (mLastInputEvent.type == IDET_LED) {
+		switch (mLastInputEvent.value) {
+		case 1:
+			bit_set(mLastInputEvent.code, mLedOnMask);
+			break;
+		case 0:
+			bit_unset(mLastInputEvent.code, mLedOnMask);
+			break;
+		}
+	}
+	return 0;
 }

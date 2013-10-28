@@ -5,17 +5,18 @@
  * Created on 2 Август 2013 г., 11:52
  */
 
-#ifndef INPUTTYPES_H
-#define	INPUTTYPES_H
+#ifndef __INPUT_TYPES_H_INC__
+#define	__INPUT_TYPES_H_INC__
 
 #include <map>
 #include <sys/time.h>
+#include <stdint.h>
 
 class InputDriverAbstract;
 class InputDeviceAbstract;
 class InputSubsystem;
 
-typedef signed long			keyvalue_t;
+typedef int32_t          keyvalue_t;
 
 typedef enum InputDeviceType 
 {
@@ -43,7 +44,7 @@ typedef enum InputDeviceStatus
 	IDS_UNITIALIZED		= -1,
 	IDS_CLOSED			=  0,
 	IDS_OPENED			=  1,
-	IDS_LISTEN			=  2,
+	IDS_LISTEN			=  2
 }
 InputDeviceStatus;
 
@@ -63,7 +64,7 @@ typedef enum InputDeviceEventType
 	IDET_FF 			= ( 1 << 10 ),
 	IDET_PWR			= ( 1 << 11 ),
 	IDET_FFS			= ( 1 << 12 ),
-	IDET_MAX			= ( 1 << 31 ),
+	IDET_MAX			= ( 1 << 31 )
 }
 InputDeviceEventType;
 
@@ -110,7 +111,7 @@ typedef enum InputDeviceAbsolute
 	IDA_MT_DISTANCE,	/* Contact hover distance */
 	IDA_MT_TOOL_X,	/* Center X tool position */
 	IDA_MT_TOOL_Y,	/* Center Y tool position */
-	IDA_MAX,
+	IDA_MAX
 }
 InputDeviceAbsolute;
 
@@ -126,14 +127,18 @@ typedef enum InputDeviceRelative
 	IDR_DIAL,
 	IDR_WHEEL,
 	IDR_MISC,
-	IDR_MAX,
+	IDR_MAX
 }
 InputDeviceRelative;
 
 typedef struct InputDriverEventInput 
 {
+	// type of event
 	InputDeviceEventType	type;
+	// time of event
 	struct timeval			time;
+	// for key event this is key state
+	// for abs or rel 
 	unsigned short			code;
 	keyvalue_t				value;
 }
@@ -173,4 +178,4 @@ typedef std::map<keyvalue_t, keyvalue_t> InputDeviceMapKeys;
 typedef std::map<InputDeviceAbsolute, InputDeviceAbsolute> InputDeviceMapAbsolute;
 typedef std::map<InputDeviceRelative, InputDeviceRelative> InputDeviceMapRelative;
 
-#endif	/* INPUTTYPES_H */
+#endif	/* __INPUT_TYPES_H_INC__ */

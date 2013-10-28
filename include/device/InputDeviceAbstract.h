@@ -5,8 +5,8 @@
  * Created on 25 Июль 2013 г., 18:40
  */
 
-#ifndef INPUTDEVICE_H
-#define	INPUTDEVICE_H
+#ifndef __INPUT_DEVICE_ABSTRACT_H_INC__
+#define	__INPUT_DEVICE_ABSTRACT_H_INC__
 
 #include "../../include/system/InputTypes.h"
 
@@ -17,27 +17,27 @@ public:
 	virtual ~InputDeviceAbstract();
 
 public:
-	virtual int Initialize() = 0;
-	virtual int Finalize() = 0;
-	virtual int Listen();
+	virtual int initialize() = 0;
+	virtual int finalize() = 0;
+	virtual int listen();
 	
 public:
-	virtual int Validate() const;
-	virtual InputDeviceType GetDeviceType() const;
-	virtual const char *GetDevicePath() const;
-	virtual const char *GetDeviceName() const;
+	virtual int validate() const;
+	virtual InputDeviceType getDeviceType() const;
+	virtual const char *getDevicePath() const;
+	virtual const char *getDeviceName() const;
 	
 public:
-	virtual int RegisterInputEventCallback(InputDeviceInputCallback callback, void *data);
-	virtual int RegisterDisconnetedEventCallback(InputDeviceDisconnectedCallback callback, void *data);
+	virtual int registerInputEventCallback(InputDeviceInputCallback callback, void *data);
+	virtual int registerDisconnetedEventCallback(InputDeviceDisconnectedCallback callback, void *data);
 
 protected:	
-	virtual int FireInputEventCallback(InputDriverEventInput *event);
-	virtual int FireDisconnetedEventCallback(InputDriverEventDisconnected *event);
+	virtual int fireInputEventCallback(InputDriverEventInput *event);
+	virtual int fireDisconnetedEventCallback(InputDriverEventDisconnected *event);
 	
 private:
-	static void InputEventCallback(InputDriverAbstract *driver, InputDriverEventInput *event, void *data);
-	static void DisconnetedEventCallback(InputDriverAbstract *driver, InputDriverEventDisconnected *event, void *data);
+	static void inputEventCallback(InputDriverAbstract *driver, InputDriverEventInput *event, void *data);
+	static void disconnetedEventCallback(InputDriverAbstract *driver, InputDriverEventDisconnected *event, void *data);
 
 protected:
 	InputDriverAbstract *				mDeviceDriver;
@@ -49,5 +49,5 @@ protected:
 	void *								mEventDisconnectedCallbackData;
 };
 
-#endif	/* INPUTDEVICE_H */
+#endif	/* __INPUT_DEVICE_ABSTRACT_H_INC__ */
 

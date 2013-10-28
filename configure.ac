@@ -31,7 +31,9 @@ AC_TYPE_UINT32_T
 AC_CHECK_FUNCS([gettimeofday memset select socket strchr strrchr])
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 include/Makefile
+])
 AC_OUTPUT
 #AC_CONFIG_FILES([Makefile])
 #AC_OUTPUT(Makefile.auto src/Makefile doc/Makefile examples/Makefile man/Makefile scripts/Makefile)

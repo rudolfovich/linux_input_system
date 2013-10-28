@@ -5,10 +5,9 @@
  * Created on 1 Август 2013 г., 18:32
  */
 
-#ifndef INPUTSUBSYSTEM_H
-#define	INPUTSUBSYSTEM_H
+#ifndef __INPUT_SUBSYSTEM_H_INC__
+#define	__INPUT_SUBSYSTEM_H_INC__
 
-#include <sys/socket.h>
 #include "InputTypes.h"
 
 class InputSubsystem
@@ -18,23 +17,23 @@ public:
 	virtual ~InputSubsystem();
 	
 public:
-	int Initialize();
-	int Finalize();
-	int Listen();
+	int initialize();
+	int finalize();
+	int listen();
 
 public:
-	virtual int RegisterConnectedCallback(InputSubsystemConnectedCallback callback, void *data);
-	virtual int RegisterDisconnectedCallback(InputSubsystemDisconnectedCallback callback, void *data);
+	virtual int registerConnectedCallback(InputSubsystemConnectedCallback callback, void *data);
+	virtual int registerDisconnectedCallback(InputSubsystemDisconnectedCallback callback, void *data);
 
 protected:
-	virtual int FireConnectedCallback(InputSubsystemEventConnected *event);
-	virtual int FireDisconnectedCallback(InputSubsystemEventDisconnected *event);
+	virtual int fireConnectedCallback(InputSubsystemEventConnected *event);
+	virtual int fireDisconnectedCallback(InputSubsystemEventDisconnected *event);
 	
 protected:
-	int ParseMessage();
-	int OnMessage(const char *type, const char *device);
-	int OnMessageAdd(const char *device);
-	int OnMessageRemove(const char *device);
+	int parseMessage();
+	int onMessage(const char *type, const char *device);
+	int onMessageAdd(const char *device);
+	int onMessageRemove(const char *device);
 
 protected:
 	int				mNetlinkSocket;
@@ -49,5 +48,4 @@ protected:
 	void *								mOnDisconnectedData;
 };
 
-#endif	/* INPUTSUBSYSTEM_H */
-
+#endif	/* __INPUT_SUBSYSTEM_H_INC__ */

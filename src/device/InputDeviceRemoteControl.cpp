@@ -16,10 +16,12 @@ InputDeviceRemoteControl::~InputDeviceRemoteControl()
 {
 }
 
-int InputDeviceRemoteControl::Initialize()
+int InputDeviceRemoteControl::initialize()
 {
+	return 0;
 }
 
-int InputDeviceRemoteControl::Finalize()
+int InputDeviceRemoteControl::finalize()
 {
+	return 0;
 }

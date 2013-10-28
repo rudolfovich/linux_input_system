@@ -20,8 +20,8 @@ protected:
 	virtual ~InputDeviceKeyboard();
 
 public:
-	virtual int Initialize();
-	virtual int Finalize();
+	virtual int initialize();
+	virtual int finalize();
 	
 private:
 

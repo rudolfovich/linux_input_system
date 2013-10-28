@@ -43,41 +43,41 @@ InputDriverAbstract::InputDriverAbstract(const char *device_path)
 
 InputDriverAbstract::~InputDriverAbstract()
 {
-	Finalize();
+	finalize();
 }
 
-int InputDriverAbstract::Initialize()
+int InputDriverAbstract::initialize()
 {
 	int ret;
 
-	ret = OpenDevice();
+	ret = openDevice();
 	if (ret < 0) {
-		Finalize();
+		finalize();
 		return ret;
 	}
-	ret = GuessDeviceType();
+	ret = guessDeviceType();
 	if (ret < 0) {
-		Finalize();
+		finalize();
 		return ret;
 	}
-	ret = InitMapping();
+	ret = initMapping();
 	if (ret < 0) {
-		Finalize();
+		finalize();
 		return ret;
 	}
-	ret = Validate();
+	ret = validate();
 	if (ret < 0) {
-		Finalize();
+		finalize();
 		return ret;
 	}
 	return 0;
 }
 
-int InputDriverAbstract::Finalize()
+int InputDriverAbstract::finalize()
 {
 	int ret;
 
-	ret = CloseDevice();
+	ret = closeDevice();
 
 	mDeviceStatus = IDS_UNITIALIZED;
 	mDeviceType = IDT_UNITIALIZED;
@@ -101,27 +101,27 @@ int InputDriverAbstract::Finalize()
 	return ret;
 }
 
-int InputDriverAbstract::Listen()
+int InputDriverAbstract::listen()
 {
 	int ret;
 
-	ret = ReadEvents();
+	ret = readEvents();
 	if (ret < 0) {
 		// Failed
 	}
 	return ret;
 }
 
-int InputDriverAbstract::OpenDevice()
+int InputDriverAbstract::openDevice()
 {
 	if (mDeviceStatus == IDS_OPENED) {
 		return 1;
 	}
 
 	if (mFileDescriptor == -1 || mFileDescriptor == 0) {
-		mFileDescriptor = open(GetDevicePath(), O_RDWR); // | O_NONBLOCK | O_EXCL
+		mFileDescriptor = open(getDevicePath(), O_RDWR); // | O_NONBLOCK | O_EXCL
 		if (mFileDescriptor == -1) {
-			perror("InputDriverAbstract::OpenDevice(): open device");
+			perror("InputDriverAbstract::openDevice(): open device");
 			return -1;
 		}
 	}
@@ -131,7 +131,7 @@ int InputDriverAbstract::OpenDevice()
 	return 0;
 }
 
-int InputDriverAbstract::CloseDevice()
+int InputDriverAbstract::closeDevice()
 {
 	if (mDeviceStatus <= IDS_CLOSED)
 		return 1;
@@ -149,7 +149,7 @@ int InputDriverAbstract::CloseDevice()
 	return 0;
 }
 
-int InputDriverAbstract::Validate() const
+int InputDriverAbstract::validate() const
 {
 	if (mDeviceType == IDT_UNITIALIZED)
 		return -10;
@@ -169,23 +169,24 @@ int InputDriverAbstract::Validate() const
 	return 0;
 }
 
-InputDeviceType InputDriverAbstract::GetDeviceType() const
+InputDeviceType InputDriverAbstract::getDeviceType() const
 {
 	return mDeviceType;
 }
 
-const char *InputDriverAbstract::GetDevicePath() const
+const char *InputDriverAbstract::getDevicePath() const
 {
 	return mDeviceFilePath.c_str();
 }
 
-const char *InputDriverAbstract::GetDeviceName() const
+const char *InputDriverAbstract::getDeviceName() const
 {
 	return mDeviceName.c_str();
 }
 
-int InputDriverAbstract::ReadEvents()
+int InputDriverAbstract::readEvents()
 {
+	ssize_t numBytes;
 	struct aiocb *mAIOCB = (struct aiocb *) mAsyncIOControlBlock;
 
 	if (0 == mAsyncIOStatus) {
@@ -214,7 +215,7 @@ int InputDriverAbstract::ReadEvents()
 		InputDriverEventDisconnected evDisconnect;
 		evDisconnect.error = ENODEV;
 		gettimeofday(&evDisconnect.time, NULL);
-		FireDisconnetedEventCallback(&evDisconnect);
+		fireDisconnetedEventCallback(&evDisconnect);
 		return 2;
 	default:
 		perror("aio_error");
@@ -222,44 +223,44 @@ int InputDriverAbstract::ReadEvents()
 		return -1;
 	}
 
-	int numBytes = aio_return(mAIOCB);
-	if (numBytes == -1)
+	numBytes = aio_return(mAIOCB);
+	if (numBytes < 0)
 		return -1;
-	if (numBytes != mAIOCB->aio_nbytes)
+	if ((size_t)numBytes != mAIOCB->aio_nbytes)
 		return -5;
 
 	mLastInputEventTriggered = false;
 	memset(&mLastInputEvent, 0, sizeof(mLastInputEvent));
 
-	int ret = ProcessEvent();
+	int ret = processEvent();
 	if (ret < 0) {
 		return -1;
 	}
 	if (mLastInputEventTriggered) {
-		FireInputEventCallback(&mLastInputEvent);
+		fireInputEventCallback(&mLastInputEvent);
 		mLastInputEventTriggered = false;
 	}
 
 	return 0;
 }
 
-int InputDriverAbstract::GuessDeviceType()
+int InputDriverAbstract::guessDeviceType()
 {
 
 	mDeviceType = IDT_UNDEFINED;
 
 	// Нужно ли проверять индикаторы? 
-	// && HasLed()
-	if (HasRepeater() && HasKeysKeyboard()) {
+	// && hasLed()
+	if (hasRepeater() && hasKeysKeyboard()) {
 		mDeviceType = IDT_KEYBOARD;
 	}
 	else
-		if (HasKeysGraphicsTablet() && HasAbsolute()) {
+		if (hasKeysGraphicsTablet() && hasAbsolute()) {
 		mDeviceType = IDT_GRAPHICS_TABLET;
 	}
 	else
-		if (HasRelative() && HasKeysMouse()) {
-		if (HasKeysTrackpad()) {
+		if (hasRelative() && hasKeysMouse()) {
+		if (hasKeysTrackpad()) {
 			mDeviceType = IDT_TRACKPAD;
 		}
 		else {
@@ -267,19 +268,19 @@ int InputDriverAbstract::GuessDeviceType()
 		}
 	}
 	else
-		if (HasKeysWheel() && HasAbsolute()) {
+		if (hasKeysWheel() && hasAbsolute()) {
 		mDeviceType = IDT_WHEEL;
 	}
 	else
-		if (HasKeysJoystic() && HasAbsolute()) {
+		if (hasKeysJoystic() && hasAbsolute()) {
 		mDeviceType = IDT_JOYSTIK;
 	}
 	else
-		if (HasKeysGamepad() && HasAbsolute()) {
+		if (hasKeysGamepad() && hasAbsolute()) {
 		mDeviceType = IDT_GAMEPAD;
 	}
 	else
-		if (HasKeysRemoteControl()) {
+		if (hasKeysRemoteControl()) {
 		mDeviceType = IDT_REMOTE_CONTROL;
 	}
 
@@ -290,7 +291,7 @@ int InputDriverAbstract::GuessDeviceType()
 	return 0;
 }
 
-int InputDriverAbstract::InitMapping()
+int InputDriverAbstract::initMapping()
 {
 	if (mSupportedEvents & IDET_KEY) {
 		mMapKeys = new InputDeviceMapKeys();
@@ -304,7 +305,7 @@ int InputDriverAbstract::InitMapping()
 	return 0;
 }
 
-keyvalue_t InputDriverAbstract::GetMappedKey(keyvalue_t key)
+keyvalue_t InputDriverAbstract::getMappedKey(keyvalue_t key)
 {
 	InputDeviceMapKeys::iterator it;
 	it = mMapKeys->find(key);
@@ -314,7 +315,7 @@ keyvalue_t InputDriverAbstract::GetMappedKey(keyvalue_t key)
 	return it->second;
 }
 
-InputDeviceAbsolute InputDriverAbstract::GetMappedAbsolute(InputDeviceAbsolute axis)
+InputDeviceAbsolute InputDriverAbstract::getMappedAbsolute(InputDeviceAbsolute axis)
 {
 	InputDeviceMapAbsolute::iterator it;
 	it = mMapAbs->find(axis);
@@ -324,7 +325,7 @@ InputDeviceAbsolute InputDriverAbstract::GetMappedAbsolute(InputDeviceAbsolute a
 	return it->second;
 }
 
-InputDeviceRelative InputDriverAbstract::GetMappedRelative(InputDeviceRelative axis)
+InputDeviceRelative InputDriverAbstract::getMappedRelative(InputDeviceRelative axis)
 {
 	InputDeviceMapRelative::iterator it;
 	it = mMapRel->find(axis);
@@ -334,13 +335,14 @@ InputDeviceRelative InputDriverAbstract::GetMappedRelative(InputDeviceRelative a
 	return it->second;
 }
 
-int InputDriverAbstract::RegisterInputEventCallback(InputDriverInputCallback callback, void *data)
+int InputDriverAbstract::registerInputEventCallback(InputDriverInputCallback callback, void *data)
 {
 	mEventInputCallback = callback;
 	mEventInputCallbackData = data;
+	return 0;
 }
 
-int InputDriverAbstract::FireInputEventCallback(InputDriverEventInput *event)
+int InputDriverAbstract::fireInputEventCallback(InputDriverEventInput *event)
 {
 	if (mEventInputCallback) {
 		if (! event->time.tv_sec && !event->time.tv_usec) {
@@ -351,13 +353,14 @@ int InputDriverAbstract::FireInputEventCallback(InputDriverEventInput *event)
 	return 0;
 }
 
-int InputDriverAbstract::RegisterDisconnetedEventCallback(InputDriverDisconnectedCallback callback, void *data)
+int InputDriverAbstract::registerDisconnetedEventCallback(InputDriverDisconnectedCallback callback, void *data)
 {
 	mEventDisconnectedCallback = callback;
 	mEventDisconnectedCallbackData = data;
+	return 0;
 }
 
-int InputDriverAbstract::FireDisconnetedEventCallback(InputDriverEventDisconnected *event)
+int InputDriverAbstract::fireDisconnetedEventCallback(InputDriverEventDisconnected *event)
 {
 	if (mEventDisconnectedCallback) {
 		if (! event->time.tv_sec && !event->time.tv_usec) {

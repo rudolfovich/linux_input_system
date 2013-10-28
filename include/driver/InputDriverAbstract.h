@@ -18,52 +18,56 @@ public:
 	virtual ~InputDriverAbstract();
 
 protected:
-	virtual int ProcessEvent() = 0;
+	virtual int processEvent() = 0;
 
 public:
-	virtual int Initialize();
-	virtual int Finalize();
-	virtual int Listen();
+	virtual int initialize();
+	virtual int finalize();
+	virtual int listen();
 
 public:
-	virtual int Validate() const;
-	virtual InputDeviceType GetDeviceType() const;
-	virtual const char *GetDevicePath() const;
-	virtual const char *GetDeviceName() const;
+	virtual int validate() const;
+	virtual InputDeviceType getDeviceType() const;
+	virtual const char *getDevicePath() const;
+	virtual const char *getDeviceName() const;
 	
 public:
-	virtual bool HasKeysKeyboard() = 0;
-	virtual bool HasKeysMouse() = 0;
-	virtual bool HasKeysJoystic() = 0;
-	virtual bool HasKeysGamepad() = 0;
-	virtual bool HasKeysRemoteControl() = 0;
-	virtual bool HasKeysWheel() = 0;
-	virtual bool HasKeysGraphicsTablet() = 0;
-	virtual bool HasKeysTrackpad() = 0;
-	virtual bool HasAbsolute() = 0;
-	virtual bool HasRelative() = 0;
-	virtual bool HasRepeater() = 0;
-	virtual bool HasLed() = 0;
-	
-protected:
-	virtual int OpenDevice();
-	virtual int CloseDevice();
-	virtual int ReadEvents();
-	virtual int GuessDeviceType();
-	
-protected:
-	virtual int InitMapping();
-	virtual keyvalue_t GetMappedKey(keyvalue_t key);
-	virtual InputDeviceAbsolute GetMappedAbsolute(InputDeviceAbsolute axis);
-	virtual InputDeviceRelative GetMappedRelative(InputDeviceRelative axis);
+	virtual bool isKeyPressed(keyvalue_t key) = 0;
+	virtual bool isLedOn(keyvalue_t led) = 0;
 
 public:
-	virtual int RegisterInputEventCallback(InputDriverInputCallback callback, void *data);
-	virtual int RegisterDisconnetedEventCallback(InputDriverDisconnectedCallback callback, void *data);
+	virtual bool hasKeysKeyboard() = 0;
+	virtual bool hasKeysMouse() = 0;
+	virtual bool hasKeysJoystic() = 0;
+	virtual bool hasKeysGamepad() = 0;
+	virtual bool hasKeysRemoteControl() = 0;
+	virtual bool hasKeysWheel() = 0;
+	virtual bool hasKeysGraphicsTablet() = 0;
+	virtual bool hasKeysTrackpad() = 0;
+	virtual bool hasAbsolute() = 0;
+	virtual bool hasRelative() = 0;
+	virtual bool hasRepeater() = 0;
+	virtual bool hasLed() = 0;
 
 protected:
-	virtual int FireInputEventCallback(InputDriverEventInput *event);
-	virtual int FireDisconnetedEventCallback(InputDriverEventDisconnected *event);
+	virtual int openDevice();
+	virtual int closeDevice();
+	virtual int readEvents();
+	virtual int guessDeviceType();
+	
+protected:
+	virtual int initMapping();
+	virtual keyvalue_t getMappedKey(keyvalue_t key);
+	virtual InputDeviceAbsolute getMappedAbsolute(InputDeviceAbsolute axis);
+	virtual InputDeviceRelative getMappedRelative(InputDeviceRelative axis);
+
+public:
+	virtual int registerInputEventCallback(InputDriverInputCallback callback, void *data);
+	virtual int registerDisconnetedEventCallback(InputDriverDisconnectedCallback callback, void *data);
+
+protected:
+	virtual int fireInputEventCallback(InputDriverEventInput *event);
+	virtual int fireDisconnetedEventCallback(InputDriverEventDisconnected *event);
 	
 protected:
 	InputDeviceType						mDeviceType;

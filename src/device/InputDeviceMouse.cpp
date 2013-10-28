@@ -16,10 +16,12 @@ InputDeviceMouse::~InputDeviceMouse()
 {
 }
 
-int InputDeviceMouse::Initialize()
+int InputDeviceMouse::initialize()
 {
+	return 0;
 }
 
-int InputDeviceMouse::Finalize()
+int InputDeviceMouse::finalize()
 {
+	return 0;
 }
