@@ -8,9 +8,6 @@
         <df name="include">
         </df>
         <df name="src">
-          <df name="olis">
-            <in>InputSystem.h</in>
-          </df>
         </df>
         <in>config.h</in>
       </df>

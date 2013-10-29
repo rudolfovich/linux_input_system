@@ -30,6 +30,7 @@
                    projectFiles="false"
                    kind="IMPORTANT_FILES_FOLDER">
       <itemPath>build/Makefile</itemPath>
+      <itemPath>cloud-deploy.sh</itemPath>
       <itemPath>configure</itemPath>
     </logicalFolder>
   </logicalFolder>
