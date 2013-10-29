@@ -32,11 +32,16 @@ public:
 	virtual int getDeviceList(InputDeviceAbstract **list, int *count);
 
 public:
+	virtual unsigned long getTargetDeviceTypeMask() const;
+	virtual void setTargetDeviceTypeMask(unsigned long mask);
+	
+public:
 	virtual int registerInputCallback(InputDeviceInputCallback callback, void *data);
 	virtual int registerDisconnetedCallback(InputDeviceDisconnectedCallback callback, void *data);
 
 protected:
-	void log(const char *fmt, ...);
+	void error_printf(const char *fmt, ...);
+	void debug_printf(const char *fmt, ...);
 	
 protected:
 	virtual int readDeviceList(const char *directory);
@@ -76,6 +81,9 @@ protected:
 	void *								mOnDeviceInputData;
 	InputDeviceDisconnectedCallback		mOnDeviceDisconnected;
 	void *								mOnDeviceDisconnectedData;
+	
+protected:
+	unsigned long						mTargetDeviceTypeMask;
 };
 
 #endif	/* __INPUT_MANAGER_H_INC__ */

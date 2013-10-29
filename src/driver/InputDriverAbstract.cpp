@@ -9,6 +9,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <fcntl.h>
 #include <stdint.h>
 #include <memory.h>
@@ -38,6 +39,7 @@ InputDriverAbstract::InputDriverAbstract(const char *device_path)
 	, mEventInputCallbackData(NULL)
 	, mEventDisconnectedCallback(NULL)
 	, mEventDisconnectedCallbackData(NULL)
+	, mIsVerbose(false)
 {
 }
 
@@ -219,7 +221,7 @@ int InputDriverAbstract::readEvents()
 		return 2;
 	default:
 		perror("aio_error");
-		fprintf(stderr, "aio_error returns %d!\n", mAsyncIOStatus);
+		error_printf("aio_error returns %d!\n", mAsyncIOStatus);
 		return -1;
 	}
 
@@ -286,7 +288,7 @@ int InputDriverAbstract::guessDeviceType()
 
 	char buf[1024];
 	InputDeviceTypeToString(mDeviceType, buf, sizeof (buf));
-	printf("  - device type [%s]\n", buf);
+	debug_printf("  - device type [%s]\n", buf);
 
 	return 0;
 }
@@ -369,4 +371,23 @@ int InputDriverAbstract::fireDisconnetedEventCallback(InputDriverEventDisconnect
 		mEventDisconnectedCallback(this, event, mEventDisconnectedCallbackData);
 	}
 	return 0;
+}
+
+void InputDriverAbstract::error_printf(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	::vfprintf(stderr, fmt, ap);
+	va_end(ap);
+}
+
+void InputDriverAbstract::debug_printf(const char *fmt, ...)
+{
+	va_list ap;
+	
+	if (mIsVerbose) {
+		va_start(ap, fmt);
+		::vprintf(fmt, ap);
+		va_end(ap);
+	}
 }

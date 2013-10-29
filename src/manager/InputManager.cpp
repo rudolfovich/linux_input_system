@@ -32,6 +32,7 @@ InputManager::InputManager()
 	, mOnDeviceInputData(NULL)
 	, mOnDeviceDisconnected(NULL)
 	, mOnDeviceDisconnectedData(NULL)
+	, mTargetDeviceTypeMask((unsigned long) -1)
 {
 	mSearchDevicePaths.push_back("/dev/input");
 }
@@ -69,13 +70,23 @@ int InputManager::finalize()
 	return 0;
 }
 
-void InputManager::log(const char *fmt, ...)
+void InputManager::error_printf(const char *fmt, ...)
 {
 	va_list va;
 
 	va_start(va, fmt);
 	vprintf(fmt, va);
 	va_end(va);
+}
+
+void InputManager::debug_printf(const char *fmt, ...)
+{
+	va_list va;
+	if (0) {
+		va_start(va, fmt);
+		vprintf(fmt, va);
+		va_end(va);
+	}
 }
 
 int InputManager::readDeviceList(const char *directory)
@@ -115,16 +126,16 @@ int InputManager::readDevice(const char *device_path)
 {
 	InputDeviceAbstract *device;
 
-	log("\n");
-	log("Creating device %s...\n", device_path);
+	debug_printf("\n");
+	debug_printf("Creating device %s...\n", device_path);
 	device = createDevice(device_path);
-	log("Creating device %s...", device_path);
+	debug_printf("Creating device %s...", device_path);
 	if (!device) {
-		log("failed!\n");
+		debug_printf("failed!\n");
 		return 1;
 	}
-	log("success!\n");
-	log("\n");
+	debug_printf("success!\n");
+	debug_printf("\n");
 	addDevice(device);
 	return 0;
 }
@@ -153,6 +164,7 @@ InputDeviceAbstract *InputManager::createDevice(const char *device_path)
 	char *name;
 	InputDriverAbstract *driver = NULL;
 	InputDeviceAbstract *device = NULL;
+	InputDeviceType type;
 
 	device = FindDeviceByPath(device_path);
 	if (NULL != device) {
@@ -177,7 +189,13 @@ InputDeviceAbstract *InputManager::createDevice(const char *device_path)
 		return NULL;
 	}
 
-	switch (driver->getDeviceType()) {
+	type = driver->getDeviceType();
+	if (0 == ((unsigned long) type & mTargetDeviceTypeMask)) {
+		delete driver;
+		return NULL;
+	}
+
+	switch (type) {
 	case IDT_KEYBOARD:
 		device = new InputDeviceKeyboard(driver);
 		break;
@@ -264,7 +282,7 @@ int InputManager::listen()
 			device = *it;
 			ret = device->listen();
 			if (ret < 0) {
-				log("Listening device failed: %s(%s), %d\n\n", device->getDeviceName(), device->getDevicePath(), ret);
+				error_printf("Listening device failed: %s(%s), %d\n\n", device->getDeviceName(), device->getDevicePath(), ret);
 				// Отключаем при ошибке
 				removeDevice(device);
 				// Начинаем перебор сначала
@@ -297,9 +315,19 @@ int InputManager::getDeviceList(InputDeviceAbstract **list, int *count)
 	}
 	*count = 0;
 	for (it = mDeviceList.begin(); it != mDeviceList.end(); it++) {
-		list[*count++] = *it;
+		list[(*count)++] = *it;
 	}
 	return *count;
+}
+
+unsigned long InputManager::getTargetDeviceTypeMask() const
+{
+	return mTargetDeviceTypeMask;
+}
+
+void InputManager::setTargetDeviceTypeMask(unsigned long mask)
+{
+	mTargetDeviceTypeMask = mask;
 }
 
 void InputManager::inputEventCallback(InputDeviceAbstract *device, InputDriverEventInput *event, void *data)
@@ -321,7 +349,7 @@ void InputManager::onDeviceInput(InputDeviceAbstract *device, InputDriverEventIn
 
 void InputManager::onDeviceDisconneted(InputDeviceAbstract *device, InputDriverEventDisconnected *event)
 {
-	log("DEVICE DISCONNECTED: [%s]!!!\n", device->getDeviceName());
+	error_printf("DEVICE DISCONNECTED: [%s]!!!\n", device->getDeviceName());
 	fireDisconnetedCallback(device, event);
 	removeDevice(device);
 }
@@ -333,7 +361,7 @@ void InputManager::inputSubsystemConnectedCallback(InputSubsystem *system, Input
 	std::string device_name, device_path;
 	std::list<std::string>::iterator it;
 
-	self->log("DEVICE CONNECTED: [%s]!!!\n", event->path);
+	self->debug_printf("DEVICE CONNECTED: [%s]!!!\n", event->path);
 
 	name = strrchr((char *) event->path, '/');
 	if (NULL == name) {
@@ -365,7 +393,7 @@ void InputManager::inputSubsystemDisconnectedCallback(InputSubsystem *system, In
 	std::list<std::string>::iterator it;
 	InputDeviceAbstract *device;
 
-	self->log("DEVICE DISCONNECTED: [%s]!!!\n", event->path);
+	self->error_printf("DEVICE DISCONNECTED: [%s]!!!\n", event->path);
 
 	name = strrchr((char *) event->path, '/');
 	if (NULL == name) {

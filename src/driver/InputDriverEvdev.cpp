@@ -78,7 +78,7 @@ int InputDriverEvdev::readDeviceInfo()
 	else {
 		/* the EVIOCGVERSION ioctl() returns an int */
 		/* so we unpack it and display it */
-		printf("  - driver version [%d.%d.%d]\n",
+		debug_printf("  - driver version [%d.%d.%d]\n",
 			version >> 16, (version >> 8) & 0xff,
 			version & 0xff);
 	}
@@ -95,71 +95,71 @@ int InputDriverEvdev::readDeviceInfo()
 		 * So we work through the various elements,
 		 * displaying each of them
 		 */
-		printf("  - vendor [%04hx] product [%04hx] version [%04hx] is on a bus [",
+		debug_printf("  - vendor [%04hx] product [%04hx] version [%04hx] is on a bus [",
 			device_info.vendor, device_info.product,
 			device_info.version);
 		switch (device_info.bustype) {
 		case BUS_PCI:
-			printf("BUS_PCI");
+			debug_printf("BUS_PCI");
 			break;
 		case BUS_ISAPNP:
-			printf("BUS_ISAPNP");
+			debug_printf("BUS_ISAPNP");
 			break;
 		case BUS_USB:
-			printf("BUS_USB");
+			debug_printf("BUS_USB");
 			break;
 		case BUS_HIL:
-			printf("BUS_HIL");
+			debug_printf("BUS_HIL");
 			break;
 		case BUS_BLUETOOTH:
-			printf("BUS_BLUETOOTH");
+			debug_printf("BUS_BLUETOOTH");
 			break;
 		case BUS_VIRTUAL:
-			printf("BUS_VIRTUAL");
+			debug_printf("BUS_VIRTUAL");
 			break;
 		case BUS_ISA:
-			printf("BUS_ISA");
+			debug_printf("BUS_ISA");
 			break;
 		case BUS_I8042:
-			printf("BUS_I8042");
+			debug_printf("BUS_I8042");
 			break;
 		case BUS_XTKBD:
-			printf("BUS_XTKBD");
+			debug_printf("BUS_XTKBD");
 			break;
 		case BUS_RS232:
-			printf("BUS_RS232");
+			debug_printf("BUS_RS232");
 			break;
 		case BUS_GAMEPORT:
-			printf("BUS_GAMEPORT");
+			debug_printf("BUS_GAMEPORT");
 			break;
 		case BUS_PARPORT:
-			printf("BUS_PARPORT");
+			debug_printf("BUS_PARPORT");
 			break;
 		case BUS_AMIGA:
-			printf("BUS_AMIGA");
+			debug_printf("BUS_AMIGA");
 			break;
 		case BUS_ADB:
-			printf("BUS_ADB");
+			debug_printf("BUS_ADB");
 			break;
 		case BUS_I2C:
-			printf("BUS_I2C");
+			debug_printf("BUS_I2C");
 			break;
 		case BUS_HOST:
-			printf("BUS_HOST");
+			debug_printf("BUS_HOST");
 			break;
 		case BUS_GSC:
-			printf("BUS_GSC");
+			debug_printf("BUS_GSC");
 			break;
 		case BUS_ATARI:
-			printf("BUS_ATARI");
+			debug_printf("BUS_ATARI");
 			break;
 		case BUS_SPI:
-			printf("BUS_SPI");
+			debug_printf("BUS_SPI");
 			break;
 		default:
-			printf("UNKNOWN(%d)", device_info.bustype);
+			debug_printf("UNKNOWN(%d)", device_info.bustype);
 		}
-		printf("]\n");
+		debug_printf("]\n");
 	}
 
 	/* suck out some device information */
@@ -168,7 +168,7 @@ int InputDriverEvdev::readDeviceInfo()
 		perror("evgname ioctl");
 	}
 	else {
-		printf("  - device name [%s]\n", device_name);
+		debug_printf("  - device name [%s]\n", device_name);
 	}
 	mDeviceName = device_name;
 
@@ -177,7 +177,7 @@ int InputDriverEvdev::readDeviceInfo()
 		perror("evphis ioctl");
 	}
 	else {
-		printf("  - device path [%s]\n", device_phys);
+		debug_printf("  - device path [%s]\n", device_phys);
 	}
 	mDevicePhisicalPath = device_phys;
 
@@ -186,7 +186,7 @@ int InputDriverEvdev::readDeviceInfo()
 		//perror("ioctl device_uniq");
 	}
 	else {
-		printf("  - device identity [%s]\n", device_uniq);
+		debug_printf("  - device identity [%s]\n", device_uniq);
 	}
 	mDeviceUnique = device_uniq;
 
@@ -205,62 +205,62 @@ int InputDriverEvdev::readSupportedEvents()
 		perror("evdev ioctl");
 		return -1;
 	}
-	printf("  - Supported event types:\n");
+	debug_printf("  - Supported event types:\n");
 	for (i = 0; i < EV_MAX; i++) {
 		if (bit_test(i, mEventMask)) {
 			/* the bit is set in the event types list */
-			printf("       - Event type 0x%02x ", i);
+			debug_printf("       - Event type 0x%02x ", i);
 			switch (i) {
 			case EV_SYN:
 				mSupportedEvents += IDET_SYN;
-				printf(" (Synch Events)\n");
+				debug_printf(" (Synch Events)\n");
 				break;
 			case EV_KEY:
 				mSupportedEvents |= IDET_KEY;
-				printf(" (Keys or Buttons)\n");
+				debug_printf(" (Keys or Buttons)\n");
 				break;
 			case EV_REL:
 				mSupportedEvents |= IDET_REL;
-				printf(" (Relative Axes)\n");
+				debug_printf(" (Relative Axes)\n");
 				break;
 			case EV_ABS:
 				mSupportedEvents |= IDET_ABS;
-				printf(" (Absolute Axes)\n");
+				debug_printf(" (Absolute Axes)\n");
 				break;
 			case EV_MSC:
 				mSupportedEvents |= IDET_MSC;
-				printf(" (Miscellaneous)\n");
+				debug_printf(" (Miscellaneous)\n");
 				break;
 			case EV_SW:
 				mSupportedEvents |= IDET_SW;
-				printf(" (SW)\n");
+				debug_printf(" (SW)\n");
 				break;
 			case EV_LED:
 				mSupportedEvents |= IDET_LED;
-				printf(" (LEDs)\n");
+				debug_printf(" (LEDs)\n");
 				break;
 			case EV_SND:
 				mSupportedEvents |= IDET_SND;
-				printf(" (Sounds)\n");
+				debug_printf(" (Sounds)\n");
 				break;
 			case EV_REP:
 				mSupportedEvents |= IDET_REP;
-				printf(" (Repeat)\n");
+				debug_printf(" (Repeat)\n");
 				break;
 			case EV_FF:
 				mSupportedEvents |= IDET_FF;
-				printf(" (Force Feedback)\n");
+				debug_printf(" (Force Feedback)\n");
 				break;
 			case EV_FF_STATUS:
 				mSupportedEvents |= IDET_FFS;
-				printf(" (Force Feedback Status)\n");
+				debug_printf(" (Force Feedback Status)\n");
 				break;
 			case EV_PWR:
 				mSupportedEvents |= IDET_PWR;
-				printf(" (Power Management)\n");
+				debug_printf(" (Power Management)\n");
 				break;
 			default:
-				printf(" (Unknown: 0x%04hx)\n", i);
+				debug_printf(" (Unknown: 0x%04hx)\n", i);
 			}
 		}
 	}
@@ -283,10 +283,10 @@ int InputDriverEvdev::readCapabilities()
 		perror("ioctl EVIOCGKEY");
 	}
 	else {
-		printf("  - keys pressed: \n");
+		debug_printf("  - keys pressed: \n");
 		for (i = 0; i < KEY_MAX; i++) {
 			if (bit_test(i, mKeyMask)) {
-				printf("  Key 0x%02x \n", i);
+				debug_printf("  Key 0x%02x \n", i);
 			}
 		}
 	}
@@ -297,12 +297,12 @@ int InputDriverEvdev::readCapabilities()
 			perror("EVIOCGBIT EV_KEY ioctl");
 		}
 		else {
-			printf("  - detected keys:  ");
+			debug_printf("  - detected keys:  ");
 			for (i = 0; i < KEY_MAX; i++) {
 				if (bit_test(i, mKeyMask))
-					printf("%d, ", i);
+					debug_printf("%d, ", i);
 			}
-			printf("\n");
+			debug_printf("\n");
 		}
 	}
 	if (mSupportedEvents & IDET_REL) {
@@ -311,12 +311,12 @@ int InputDriverEvdev::readCapabilities()
 			perror("EVIOCGBIT EV_KEY ioctl");
 		}
 		else {
-			printf("  - detected rels:  ");
+			debug_printf("  - detected rels:  ");
 			for (i = 0; i < REL_MAX; i++) {
 				if (bit_test(i, mRelMask))
-					printf("%d, ", i);
+					debug_printf("%d, ", i);
 			}
-			printf("\n");
+			debug_printf("\n");
 		}
 	}
 	if (mSupportedEvents & IDET_ABS) {
@@ -325,12 +325,12 @@ int InputDriverEvdev::readCapabilities()
 			perror("EVIOCGBIT EV_KEY ioctl");
 		}
 		else {
-			printf("  - detected abs:  ");
+			debug_printf("  - detected abs:  ");
 			for (i = 0; i < ABS_MAX; i++) {
 				if (bit_test(i, mAbsMask))
-					printf("%d, ", i);
+					debug_printf("%d, ", i);
 			}
-			printf("\n");
+			debug_printf("\n");
 		}
 	}
 
@@ -341,7 +341,7 @@ int InputDriverEvdev::readCapabilities()
 		codes[0] = i;
 		ret = ioctl(mFileDescriptor, EVIOCGKEYCODE, codes);
 		if (0 == ret) {
-			printf("[0]= %d, [1] = %d\n", codes[0], codes[1]);
+			debug_printf("[0]= %d, [1] = %d\n", codes[0], codes[1]);
 		}
 	}
 	 */
@@ -352,12 +352,12 @@ int InputDriverEvdev::readCapabilities()
 			perror("EVIOCGBIT ioctl failed");
 		}
 		else {
-			printf("  - detected leds:  ");
+			debug_printf("  - detected leds:  ");
 			for (i = 0; i < LED_MAX; i++) {
 				if (bit_test(i, mLedMask))
-					printf("%d, ", i);
+					debug_printf("%d, ", i);
 			}
-			printf("\n");
+			debug_printf("\n");
 		}
 	}
 	if (mSupportedEvents & IDET_FF) {
@@ -378,59 +378,59 @@ int InputDriverEvdev::processEvent()
 	mLastInputEvent.code = mInputEvent.code;
 	mLastInputEvent.time = mInputEvent.time;
 	mLastInputEvent.value = mInputEvent.value;
-	//printf("   + device event %s: ", mDeviceName.c_str());
+	//debug_printf("   + device event %s: ", mDeviceName.c_str());
 	switch (mInputEvent.type) {
 	case EV_SYN:
 		mLastInputEvent.type = IDET_SYN;
-		//printf(" - EV_SYN: %d, %d\n", event.code, event.value);
+		//debug_printf(" - EV_SYN: %d, %d\n", event.code, event.value);
 		break;
 	case EV_KEY:
 		mLastInputEvent.type = IDET_KEY;
 		processKey();
-		//printf(" - EV_KEY: %d, %d\n", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_KEY: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_REL:
 		mLastInputEvent.type = IDET_REL;
 		processRel();
-		//printf(" - EV_REL: %d, %d\n", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_REL: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_ABS:
 		mLastInputEvent.type = IDET_ABS;
 		processAbs();
-		//printf(" - EV_ABS: %d, %d\n", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_ABS: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_MSC:
 		mLastInputEvent.type = IDET_MSC;
-		//printf(" - EV_MSC: %d, %d\n", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_MSC: %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_SW:
 		mLastInputEvent.type = IDET_SW;
-		//printf(" - EV_SW:  %d, %d\n", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_SW:  %d, %d\n", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_LED:
 		mLastInputEvent.type = IDET_LED;
-		//printf(" - EV_LED: %d : %d", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_LED: %d : %d", mInputEvent.code, mInputEvent.value);
 		processLed();
 		break;
 	case EV_SND:
 		mLastInputEvent.type = IDET_SND;
-		//printf(" - EV_SND: %d : %d", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_SND: %d : %d", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_REP:
 		mLastInputEvent.type = IDET_REP;
-		//printf(" - EV_REP: %d : %d", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_REP: %d : %d", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_FF:
 		mLastInputEvent.type = IDET_FF;
-		//printf(" - EV_FF: %d : %d", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_FF: %d : %d", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_PWR:
 		mLastInputEvent.type = IDET_PWR;
-		//printf(" - EV_PWR: %d : %d", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_PWR: %d : %d", mInputEvent.code, mInputEvent.value);
 		break;
 	case EV_FF_STATUS:
 		mLastInputEvent.type = IDET_FFS;
-		//printf(" - EV_FF_STATUS: %d : %d", mInputEvent.code, mInputEvent.value);
+		//debug_printf(" - EV_FF_STATUS: %d : %d", mInputEvent.code, mInputEvent.value);
 		break;
 	default:
 		mLastInputEvent.type = IDET_UNITIALIZED;

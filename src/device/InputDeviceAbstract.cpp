@@ -44,6 +44,16 @@ const char *InputDeviceAbstract::getDeviceName() const
 	return mDeviceDriver->getDeviceName();
 }
 
+unsigned short InputDeviceAbstract::getDeviceId() const
+{
+	return mIdentifier;
+}
+
+void InputDeviceAbstract::setDeviceId(unsigned short identifier)
+{
+	mIdentifier = identifier;
+}
+
 int InputDeviceAbstract::listen()
 {
 	return mDeviceDriver->listen();

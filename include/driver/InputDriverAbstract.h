@@ -68,6 +68,10 @@ public:
 protected:
 	virtual int fireInputEventCallback(InputDriverEventInput *event);
 	virtual int fireDisconnetedEventCallback(InputDriverEventDisconnected *event);
+
+protected:
+	virtual void error_printf(const char *fmt, ...);
+	virtual void debug_printf(const char *fmt, ...);
 	
 protected:
 	InputDeviceType						mDeviceType;
@@ -92,6 +96,9 @@ protected:
 	InputDeviceMapRelative *			mMapRel;
 	InputDriverEventInput				mLastInputEvent;
 	bool								mLastInputEventTriggered;
+	
+protected:
+	bool								mIsVerbose;
 	
 protected:
 	void *								mAsyncIOEventBuffer;

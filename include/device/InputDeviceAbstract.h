@@ -26,6 +26,8 @@ public:
 	virtual InputDeviceType getDeviceType() const;
 	virtual const char *getDevicePath() const;
 	virtual const char *getDeviceName() const;
+	virtual unsigned short getDeviceId() const;
+	virtual void setDeviceId(unsigned short identifier);
 	
 public:
 	virtual int registerInputEventCallback(InputDeviceInputCallback callback, void *data);
@@ -47,6 +49,9 @@ protected:
 	void *								mEventInputCallbackData;
 	InputDeviceDisconnectedCallback		mEventDisconnectedCallback;
 	void *								mEventDisconnectedCallbackData;
+	
+private:
+	unsigned short						mIdentifier;
 };
 
 #endif	/* __INPUT_DEVICE_ABSTRACT_H_INC__ */
