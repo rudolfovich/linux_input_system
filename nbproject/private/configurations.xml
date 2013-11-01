@@ -5,11 +5,10 @@
       <df name="autom4te.cache">
       </df>
       <df name="build">
-        <df name="include">
+        <df name="tmp">
         </df>
-        <df name="src">
-        </df>
-        <in>config.h</in>
+      </df>
+      <df name="BUILD_DIR">
       </df>
       <df name="include">
         <df name="device">
