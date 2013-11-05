@@ -7,8 +7,11 @@ function build()
 {
 	local cppflags_base="${CPPFLAGS}"
 	local cppflags="${CPPFLAGS}"
+	local ldflags_base="${LDFLAGS}"
+	local ldflags="${LDFLAGS}"
 	local cfgflags=""
 	local platform=$1
+	local arch="default"
 	if [ -z "${platform}" ]; then
 		echo "required [platform] argument"
 		exit 1
@@ -17,8 +20,13 @@ function build()
 	local CXX=
 	case "${platform}" in
 		linux)
+            arch="i686-linux-gnueabihf"
+            cfgflags+=" --host ${arch}"
+            cppflags+=" -m32"
+            ldflags+=" -m32"
 			;;
 		raspberrypi)
+            arch="arm-linux-gnueabihf"
 			cfgflags+=" --host arm-linux-gnueabihf"
 			CC=/opt/toolchains/raspberrypi/bin/arm-linux-gnueabihf-gcc
 			CXX=/opt/toolchains/raspberrypi/bin/arm-linux-gnueabihf-g++
@@ -63,14 +71,17 @@ function build()
 	cfgflags="${cfgflags}" \
 	CC=$CC \
 	CXX=$CXX \
-	build_conf "${platform}" "Debug"
+    LDFLAGS="${ldflags}"
+	build_conf "${platform}" "${arch}" "Debug"
 
 	CPPFLAGS="${cppflags} -O3" \
 	cfgflags="${cfgflags}" \
 	CC=$CC \
 	CXX=$CXX \
-	build_conf "${platform}" "Release"
+    LDFLAGS="${ldflags}"
+	build_conf "${platform}" "${arch}" "Release"
 	export CPPFLAGS="${cppflags_base}"
+	export LDFLAGS="${ldflags_base}"
 
 	cd "${SDIR}"
 	if [ 0 -ne "$?" ]; then
@@ -91,12 +102,17 @@ function build_conf()
 		echo "required [platform] argument"
 		exit 1
 	fi
-	local conf=$2
+	local arch=$2
+	if [ -z "${arch}" ]; then
+		echo "required [arch] argument"
+		exit 1
+	fi
+	local conf=$3
 	if [ -z "${conf}" ]; then
 		echo "required [conf] argument"
 		exit 1
 	fi
-	local dest="$(readlink -f "${SDIR}/../lib/linux/${platform}/${conf}")"
+	local dest="$(readlink -f "${SDIR}/../lib/linux/${platform}-${arch}/${conf}")"
 	mkdir -p "${dest}"
 	if [ 0 -ne "$?" ]; then
 		echo "Failed to create dir [${dest}]"
@@ -111,6 +127,7 @@ function build_conf()
 		CPPFLAGS="$CPPFLAGS" \
 		CC="$CC" \
 		CXX="$CXX" \
+        LDFLAGS="$LDFLAGS" \
 		>> configure_cloud.log
 	if [ 0 -ne "$?" ]; then
 		echo " ===== configure_cloud.log ===== "
