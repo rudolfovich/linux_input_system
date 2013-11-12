@@ -5,13 +5,14 @@ export SDIR="$(readlink -f "$(dirname $0)")"
 
 function build()
 {
+	local platform=$1
+	local arch="default"
 	local cppflags_base="${CPPFLAGS}"
 	local cppflags="${CPPFLAGS}"
 	local ldflags_base="${LDFLAGS}"
 	local ldflags="${LDFLAGS}"
 	local cfgflags=""
-	local platform=$1
-	local arch="default"
+	local tmp_build_dir=""
 	if [ -z "${platform}" ]; then
 		echo "required [platform] argument"
 		exit 1
@@ -19,50 +20,60 @@ function build()
 	local CC=
 	local CXX=
 	case "${platform}" in
-		linux)
-            arch="i686-linux-gnueabihf"
+		"linux")
+			arch="x86_64-linux-gnueabihf"
+            cfgflags+=" --host ${arch}"
+            cppflags+=" -m64"
+            ldflags+=" -m64"
+			;;
+		"linux-i686")
+			arch="i686-linux-gnueabihf"
             cfgflags+=" --host ${arch}"
             cppflags+=" -m32"
             ldflags+=" -m32"
 			;;
-		raspberrypi)
+		"raspberrypi")
             arch="arm-linux-gnueabihf"
 			cfgflags+=" --host arm-linux-gnueabihf"
 			CC=/opt/toolchains/raspberrypi/bin/arm-linux-gnueabihf-gcc
 			CXX=/opt/toolchains/raspberrypi/bin/arm-linux-gnueabihf-g++
 			;;
-		cubieboard2)
+		"cubieboard")
+            arch="arm-linux-gnueabihf"
+			cfgflags+=" --host arm-linux-gnueabihf"
+			CC=/opt/toolchains/raspberrypi/bin/arm-linux-gnueabihf-gcc
+			CXX=/opt/toolchains/raspberrypi/bin/arm-linux-gnueabihf-g++
 			;;
-		dune)
+		"dune")
 			;;
-		stlinux)
+		"stlinux")
 			;;
 		*)
 			echo "Error: unsupported platform [${platform}]"
 			exit 1;
 			;;
 	esac
-	echo "Building platform [${platform}]"
-	local build_dir="${SDIR}/build/${platform}"
-	#echo " - build_dir  = [${build_dir}]"
-	mkdir -p "${build_dir}"
+	echo "Building platform [${platform}] arch is [${arch}]"
+	tmp_build_dir="${SDIR}/build/${platform}"
+	echo " - _Build directory is [${tmp_build_dir}]"
+	mkdir -p "${tmp_build_dir}"
 	if [ 0 -ne "$?" ]; then
-		echo "Failed to create dir [${build_dir}]"
+		echo "Failed to create dir [${tmp_build_dir}]"
 		exit 1
 	fi
-	cd "${build_dir}"
+	cd "${tmp_build_dir}"
 	if [ 0 -ne "$?" ]; then
-		echo "Failed to change dir [${build_dir}]"
+		echo "Failed to change dir [${tmp_build_dir}]"
 		exit 1
 	fi
-	if [ "$(pwd)" != "${build_dir}" ]; then
-		echo "Failed to change dir [${build_dir}] confirm"
+	if [ "$(pwd)" != "${tmp_build_dir}" ]; then
+		echo "Failed to change dir [${tmp_build_dir}] confirm"
 		exit 1
 	fi
 	rm -rf *
 	if [ 0 -ne "$?" ]; then
 		echo "!!! rm * from [$(pwd)] !!!"
-		echo "Failed to clear dir [${build_dir}]"
+		echo "Failed to clear dir [${tmp_build_dir}]"
 		exit 1
 	fi
 
@@ -88,9 +99,9 @@ function build()
 		echo "Failed to change dir [${SDIR}]"
 		exit 1
 	fi
-	rm -rf "${build_dir}"
+	rm -rf "${tmp_build_dir}"
 	if [ 0 -ne "$?" ]; then
-		echo "Failed to remove dir [${build_dir}]"
+		echo "Failed to remove dir [${tmp_build_dir}]"
 		exit 1
 	fi
 }
@@ -159,8 +170,9 @@ function build_conf()
 	echo " -  done"
 }
 
-build linux
-build raspberrypi
-#build cubieboard2
-#build dune
-#build stlinux
+build "linux"
+#build "raspberrypi"
+#build "cubieboard"
+#build "dune"
+#build "stlinux"
+#build "cubieboard"
